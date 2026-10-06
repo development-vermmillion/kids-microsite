@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Badge;
 use App\Models\Challenge;
 use App\Models\Rider;
+use App\Support\ProgressService;
 use App\Support\Uploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\View\View;
 
 class RiderController extends Controller
 {
+    public function __construct(private ProgressService $progress) {}
+
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('q'));
@@ -151,6 +154,8 @@ class RiderController extends Controller
             ]);
         }
 
+        $this->progress->recalculate($rider);
+
         return redirect()->route('admin.riders.show', $rider)
             ->with('success', 'Badges saved.'.(count($newlyUnlocked) ? ' The rider was notified about '.count($newlyUnlocked).' new badge(s).' : ''));
     }
@@ -163,6 +168,7 @@ class RiderController extends Controller
             'challenges.*.progress' => ['nullable', 'numeric', 'min:0'],
         ]);
 
+        $current = $rider->challenges()->get()->keyBy('id');
         $sync = [];
         foreach (Challenge::all() as $challenge) {
             $input = $request->input("challenges.{$challenge->id}", []);
@@ -170,14 +176,16 @@ class RiderController extends Controller
                 continue;
             }
 
-            $progress = (float) ($input['progress'] ?? 0);
+            $existing = $current->get($challenge->id)?->pivot;
             $sync[$challenge->id] = [
-                'progress_value' => $progress,
-                'completed_at' => $progress >= $challenge->target_value ? now() : null,
+                // Automatic challenges are recalculated from rides below.
+                'progress_value' => $challenge->is_auto ? ($existing->progress_value ?? 0) : (float) ($input['progress'] ?? 0),
+                'completed_at' => $existing?->completed_at,
             ];
         }
 
         $rider->challenges()->sync($sync);
+        $this->progress->recalculate($rider);
 
         return redirect()->route('admin.riders.show', $rider)->with('success', 'Challenge progress saved.');
     }

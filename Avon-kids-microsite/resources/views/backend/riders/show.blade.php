@@ -70,7 +70,7 @@
                 <tbody>
                     @forelse ($rides as $ride)
                         <tr>
-                            <td>{{ $ride->title ?: 'Ride' }}</td>
+                            <td>{{ $ride->display_title }}</td>
                             <td>{{ $ride->ride_date->format('d M Y') }}</td>
                             <td class="num">{{ Format::km($ride->distance_km) }} km</td>
                             <td class="num muted">{{ $ride->duration_label ?? '—' }}</td>
@@ -100,7 +100,7 @@
                             <th>Badge</th>
                             <th>Unlocked</th>
                             <th>Unlocked on</th>
-                            <th class="num">Progress %</th>
+                            <th class="num">Progress</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,16 +115,24 @@
                                 </td>
                                 <td>
                                     <input type="checkbox" name="badges[{{ $badge->id }}][unlocked]" value="1"
-                                        style="width:18px;height:18px;accent-color:var(--red)" @checked($pivot?->unlocked_at) />
+                                        style="width:18px;height:18px;accent-color:var(--red)" @checked($pivot?->unlocked_at)
+                                        onchange="const r = this.closest('tr'); r.querySelector('.unlock-date').hidden = !this.checked; r.querySelectorAll('.progress-cell').forEach(el => el.hidden = this.checked)" />
                                 </td>
                                 <td>
-                                    <input type="date" class="input" style="padding:6px 8px;min-width:140px"
-                                        name="badges[{{ $badge->id }}][unlocked_at]"
+                                    <input type="date" class="input input-sm unlock-date" style="width:140px"
+                                        name="badges[{{ $badge->id }}][unlocked_at]" @if (! $pivot?->unlocked_at) hidden @endif
                                         value="{{ $pivot?->unlocked_at ? \Illuminate\Support\Carbon::parse($pivot->unlocked_at)->toDateString() : '' }}" />
                                 </td>
                                 <td class="num">
-                                    <input type="number" min="0" max="100" class="input" style="padding:6px 8px;width:80px"
-                                        name="badges[{{ $badge->id }}][progress]" value="{{ $pivot->progress_percent ?? 0 }}" />
+                                    @if ($badge->is_auto)
+                                        <span class="pill tone-blue" title="Calculated from verified rides">Auto · {{ $pivot->progress_percent ?? 0 }}%</span>
+                                        <input type="hidden" name="badges[{{ $badge->id }}][progress]" value="{{ $pivot->progress_percent ?? 0 }}" />
+                                    @else
+                                        <span class="progress-cell" @if ($pivot?->unlocked_at) hidden @endif>
+                                            <input type="number" min="0" max="100" class="input input-sm" style="width:64px"
+                                                name="badges[{{ $badge->id }}][progress]" value="{{ $pivot->progress_percent ?? 0 }}" /> %
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -132,7 +140,7 @@
                 </table>
             </div>
             <div class="form-actions">
-                <span class="muted" style="margin-right:auto;font-size:13px">Ticking a new badge sends the rider an alert.</span>
+                <span class="muted" style="margin-right:auto;font-size:13px">Ticking a new badge sends the rider an alert. “Auto” progress comes from verified rides.</span>
                 <button type="submit" class="btn btn-primary">Save badges</button>
             </div>
         </form>
@@ -168,8 +176,13 @@
                                         style="width:18px;height:18px;accent-color:var(--red)" @checked($pivot) />
                                 </td>
                                 <td class="num" style="white-space:nowrap">
-                                    <input type="number" min="0" step="0.1" class="input" style="padding:6px 8px;width:80px"
-                                        name="challenges[{{ $challenge->id }}][progress]" value="{{ Format::number($pivot->progress_value ?? 0) }}" />
+                                    @if ($challenge->is_auto)
+                                        <span class="pill tone-blue" title="Calculated from verified rides">Auto</span>
+                                        <strong>{{ Format::number($pivot->progress_value ?? 0) }}</strong>
+                                    @else
+                                        <input type="number" min="0" step="0.1" class="input input-sm" style="width:72px"
+                                            name="challenges[{{ $challenge->id }}][progress]" value="{{ Format::number($pivot->progress_value ?? 0) }}" />
+                                    @endif
                                     <span class="muted">/ {{ Format::number($challenge->target_value) }} {{ $challenge->unit }}</span>
                                 </td>
                             </tr>

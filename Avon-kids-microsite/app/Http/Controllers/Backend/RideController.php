@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ride;
 use App\Models\Rider;
 use App\Support\Format;
+use App\Support\ProgressService;
 use App\Support\Uploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,6 +24,8 @@ class RideController extends Controller
         'Duplicate ride',
         'Not a bicycle ride',
     ];
+
+    public function __construct(private ProgressService $progress) {}
 
     public function index(Request $request): View
     {
@@ -84,6 +87,7 @@ class RideController extends Controller
         $data['reviewed_at'] = $data['status'] === Ride::STATUS_PENDING ? null : now();
 
         $ride = Ride::create($data);
+        $this->progress->recalculate($ride->rider);
 
         return redirect()->route('admin.rides.show', $ride)->with('success', 'Ride added.');
     }
@@ -109,7 +113,14 @@ class RideController extends Controller
             $data['reviewed_at'] = $data['status'] === Ride::STATUS_PENDING ? null : now();
         }
 
+        $oldRider = $ride->rider;
         $ride->update($data);
+
+        // Both riders, in case the ride was moved to someone else.
+        $this->progress->recalculate($ride->fresh()->rider);
+        if ($oldRider->id !== $ride->rider_id) {
+            $this->progress->recalculate($oldRider);
+        }
 
         return redirect()->route('admin.rides.show', $ride)->with('success', 'Ride updated.');
     }
@@ -117,7 +128,9 @@ class RideController extends Controller
     public function destroy(Ride $ride): RedirectResponse
     {
         Uploads::delete($ride->proof_image);
+        $rider = $ride->rider;
         $ride->delete();
+        $this->progress->recalculate($rider);
 
         return redirect()->route('admin.rides.index')->with('success', 'Ride deleted.');
     }
@@ -169,6 +182,8 @@ class RideController extends Controller
     /** After a review, jump straight to the next ride in the queue if there is one. */
     private function afterReview(Ride $ride, string $message): RedirectResponse
     {
+        $this->progress->recalculate($ride->rider);
+
         $next = Ride::where('status', Ride::STATUS_PENDING)->oldest()->first();
 
         return $next

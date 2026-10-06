@@ -18,11 +18,20 @@
         @endif
 
         <div class="card-pad form-grid">
+            <div class="form-section"><span class="material-symbols-outlined">workspace_premium</span> Badge</div>
             <x-admin.input name="name" label="Badge name" :value="$badge->name" required placeholder="e.g. Century Club" />
             <x-admin.input name="description" label="How to earn it" :value="$badge->description" required
                 placeholder="e.g. Ride a total of 100km." />
+            <div class="form-section"><span class="material-symbols-outlined">palette</span> Look</div>
             <x-admin.icon :value="$badge->icon" :color="$badge->color" label="Icon (Trophy Room & milestones)" />
             <x-admin.color :value="$badge->color" />
+            <div class="form-section"><span class="material-symbols-outlined">lock_open</span> Unlocking</div>
+            <x-admin.select name="metric" label="How it is unlocked" :options="\App\Support\ProgressService::METRICS"
+                :value="$badge->metric"
+                hint="Automatic badges unlock by themselves when the rider reaches the goal (all-time verified rides). Badges can also be unlocked by a challenge, or by hand on a rider's page." />
+            <x-admin.input name="target_value" type="number" step="0.1" min="0" label="Goal (automatic badges)"
+                :value="$badge->target_value" hint="e.g. 100 for “Ride a total of 100km”. Leave empty for “Set by admin”." />
+            <div class="form-section"><span class="material-symbols-outlined">visibility</span> Where it appears</div>
             <x-admin.image name="image" label="Badge image (home page)" :current="$badge->image_url"
                 hint="Used in the home page “New Badges to Earn” cards. Square image, up to 4 MB." full />
             <x-admin.checkbox name="show_on_home" label="Show on home page (New Badges to Earn)" :checked="$badge->show_on_home" />

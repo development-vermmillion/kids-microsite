@@ -5,14 +5,30 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="page-head">
-        <div>
-            <h1>Dashboard</h1>
-            <p>Welcome back, {{ auth()->user()->name }}. Here is what is happening on Kids Avon.</p>
+    @php($hour = now()->hour)
+    <div class="welcome">
+        <span class="material-symbols-outlined bike">pedal_bike</span>
+        <div style="position:relative">
+            <h1>{{ $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good evening') }}, {{ \Illuminate\Support\Str::before(auth()->user()->name, ' ') }}!</h1>
+            <p>
+                @if ($stats['pending'])
+                    {{ $stats['pending'] }} {{ str('ride')->plural($stats['pending']) }} {{ $stats['pending'] === 1 ? 'is' : 'are' }} waiting for your review.
+                @else
+                    All rides are reviewed. Nice work!
+                @endif
+            </p>
         </div>
-        <div class="page-actions">
-            <a href="{{ route('admin.rides.index', ['status' => 'pending']) }}" class="btn btn-primary">
-                <span class="material-symbols-outlined">fact_check</span> Review rides
+        <div class="actions">
+            @if ($stats['pending'])
+                <a href="{{ route('admin.rides.index', ['status' => 'pending']) }}" class="btn btn-white">
+                    <span class="material-symbols-outlined">fact_check</span> Review rides
+                </a>
+            @endif
+            <a href="{{ route('admin.notifications.create') }}" class="btn btn-ghost">
+                <span class="material-symbols-outlined">campaign</span> Send alert
+            </a>
+            <a href="{{ route('admin.challenges.create') }}" class="btn btn-ghost">
+                <span class="material-symbols-outlined">add</span> New challenge
             </a>
         </div>
     </div>
@@ -130,7 +146,7 @@
                     @forelse ($recentRides as $ride)
                         <tr>
                             <td>{{ $ride->rider->name }}</td>
-                            <td><a href="{{ route('admin.rides.show', $ride) }}">{{ $ride->title ?: 'Ride' }}</a>
+                            <td><a href="{{ route('admin.rides.show', $ride) }}">{{ $ride->display_title }}</a>
                                 <span class="muted">· {{ $ride->ride_date->format('d M Y') }}</span></td>
                             <td class="num">{{ Format::km($ride->distance_km) }} km</td>
                             <td><x-admin.status :status="$ride->status" /></td>

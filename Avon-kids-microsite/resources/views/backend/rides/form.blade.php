@@ -21,6 +21,7 @@
         @endif
 
         <div class="card-pad form-grid">
+            <div class="form-section"><span class="material-symbols-outlined">directions_bike</span> Ride</div>
             <x-admin.select name="rider_id" label="Rider" :options="$riders" :value="$ride->rider_id"
                 placeholder="Choose a rider" required full />
             <x-admin.input name="title" label="Ride name (optional)" :value="$ride->title" placeholder="e.g. Weekend Trail Explorer" full />
@@ -30,6 +31,7 @@
             <x-admin.input name="distance_km" type="number" step="0.1" min="0" label="Distance (km)" :value="$ride->distance_km" required />
             <x-admin.input name="duration_minutes" type="number" min="0" label="Duration (minutes)" :value="$ride->duration_minutes"
                 hint="Used for Time in Saddle on the progress page." />
+            <div class="form-section"><span class="material-symbols-outlined">fact_check</span> Review</div>
             <x-admin.select name="status" label="Status" :value="$ride->status"
                 :options="['pending' => 'Pending review', 'verified' => 'Verified', 'rejected' => 'Rejected']" />
             <x-admin.input name="rejection_reason" label="Rejection reason" :value="$ride->rejection_reason"

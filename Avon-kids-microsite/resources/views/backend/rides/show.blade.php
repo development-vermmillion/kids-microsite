@@ -8,7 +8,7 @@
     <div class="page-head">
         <div>
             <p><a href="{{ route('admin.rides.index') }}">← All rides</a></p>
-            <h1>{{ $ride->title ?: 'Ride' }} <x-admin.status :status="$ride->status" /></h1>
+            <h1>{{ $ride->display_title }} <x-admin.status :status="$ride->status" /></h1>
             <p>Uploaded {{ $ride->created_at->format('d M Y, g:i a') }} by {{ $ride->rider->name }}</p>
         </div>
         <div class="page-actions">
@@ -35,7 +35,7 @@
             @endif
         </div>
 
-        <div>
+        <div class="stack">
             <div class="card card-pad">
                 <h2 style="font-size:19px;margin-bottom:14px">Ride details</h2>
                 <dl class="kv">

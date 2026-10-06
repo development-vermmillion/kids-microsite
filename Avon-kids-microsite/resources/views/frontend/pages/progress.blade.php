@@ -73,12 +73,12 @@
                             <span class="material-symbols-outlined">pedal_bike</span>
                         </div>
                         <div class="ride-details">
-                            <h4 class="font-headline-sm">{{ $ride->title ?: 'Ride' }}</h4>
+                            <h4 class="font-headline-sm">{{ $ride->display_title }}</h4>
                             <p class="font-body-md text-variant">
                                 {{ $ride->ride_date->format('d M Y') }} • {{ Format::km($ride->distance_km) }} km{{ $ride->duration_label ? ' • '.$ride->duration_label : '' }}
                             </p>
                         </div>
-                        <div class="ride-status status-{{ $ride->status }} font-label-sm">
+                        <div class="ride-status status-{{ $ride->status }} font-label-sm" title="{{ $ride->status_label }}">
                             <span class="material-symbols-outlined">{{ $ride->status_icon }}</span>
                             {{ $ride->status_label }}
                         </div>
@@ -87,9 +87,15 @@
                     <p class="font-body-md text-variant">No rides yet. Upload your first ride to get started!</p>
                 @endforelse
             </div>
-            <div class="view-all">
-                <a href="#" class="font-label-lg">View All History</a>
-            </div>
+            @if ($totalUploaded > $recentRides->count())
+                <div class="view-all">
+                    <a href="{{ route('progress.history') }}" class="font-label-lg">View All History ({{ $totalUploaded }} rides)</a>
+                </div>
+            @elseif ($totalUploaded)
+                <div class="view-all">
+                    <a href="{{ route('progress.history') }}" class="font-label-lg">View All History</a>
+                </div>
+            @endif
         </div>
 
     </div>

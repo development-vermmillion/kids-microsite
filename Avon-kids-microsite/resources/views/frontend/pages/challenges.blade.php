@@ -17,8 +17,8 @@
         </div>
 
         <div class="challenges-grid">
-            @foreach ($challenges as $challenge)
-                <div class="challenge-card soft-shadow {{ $challenge->is_joined ? '' : 'unstarted' }}">
+            @forelse ($challenges as $challenge)
+                <div class="challenge-card soft-shadow {{ $challenge->is_joined ? '' : 'unstarted' }} {{ $challenge->is_completed ? 'completed' : '' }}">
                     <div class="card-top bg-{{ $challenge->color }}-gradient">
                         <span class="material-symbols-outlined challenge-icon">{{ $challenge->icon }}</span>
                         <div class="badge-reward">
@@ -29,6 +29,17 @@
                     <div class="card-body">
                         <h3 class="font-headline-sm">{{ $challenge->title }}</h3>
                         <p class="font-body-md text-variant desc">{{ $challenge->description }}</p>
+                        @if ($challenge->ends_at)
+                            <p class="challenge-dates">
+                                <span class="material-symbols-outlined">event</span>
+                                @if ($challenge->ends_at->isToday())
+                                    Ends today!
+                                @else
+                                    @php($daysLeft = (int) now()->startOfDay()->diffInDays($challenge->ends_at))
+                                    Ends {{ $challenge->ends_at->format('j M') }} · {{ $daysLeft }} {{ str('day')->plural($daysLeft) }} left
+                                @endif
+                            </p>
+                        @endif
 
                         <div class="progress-section">
                             <div class="progress-info">
@@ -42,12 +53,27 @@
                             </div>
                         </div>
 
-                        <button class="btn btn-{{ $challenge->color }} chunky-shadow font-label-lg">
-                            {{ $challenge->is_joined ? 'Log Progress' : 'Accept Challenge' }}
-                        </button>
+                        @if ($challenge->is_completed)
+                            <span class="btn btn-done font-label-lg">
+                                <span class="material-symbols-outlined">verified</span> Completed
+                            </span>
+                        @elseif ($challenge->is_joined)
+                            <a href="{{ route('rides.create') }}" class="btn btn-{{ $challenge->color }} chunky-shadow font-label-lg">
+                                Log Progress
+                            </a>
+                        @else
+                            <form method="POST" action="{{ route('challenges.join', $challenge) }}">
+                                @csrf
+                                <button type="submit" class="btn btn-{{ $challenge->color }} chunky-shadow font-label-lg">
+                                    Accept Challenge
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <p class="challenges-empty">No challenges are running right now. Check back soon!</p>
+            @endforelse
         </div>
     </div>
 @endsection

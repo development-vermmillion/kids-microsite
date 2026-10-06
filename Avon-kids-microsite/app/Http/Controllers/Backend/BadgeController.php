@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Badge;
+use App\Support\ProgressService;
 use App\Support\Uploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class BadgeController extends Controller
         return view('backend.badges.form', ['badge' => new Badge([
             'icon' => 'military_tech',
             'color' => 'primary',
+            'metric' => 'manual',
             'show_in_trophy_room' => true,
             'sort_order' => (Badge::max('sort_order') ?? 0) + 1,
         ])]);
@@ -36,7 +38,10 @@ class BadgeController extends Controller
         $data = $this->validated($request);
         $data['image'] = $request->hasFile('image') ? Uploads::store($request->file('image'), 'badges') : null;
 
-        Badge::create($data);
+        $badge = Badge::create($data);
+        if ($badge->is_auto) {
+            app(ProgressService::class)->recalculateAll();
+        }
 
         return redirect()->route('admin.badges.index')->with('success', 'Badge added.');
     }
@@ -56,6 +61,9 @@ class BadgeController extends Controller
         }
 
         $badge->update($data);
+        if ($badge->is_auto) {
+            app(ProgressService::class)->recalculateAll();
+        }
 
         return redirect()->route('admin.badges.index')->with('success', 'Badge updated.');
     }
@@ -75,12 +83,15 @@ class BadgeController extends Controller
             'description' => ['required', 'string', 'max:255'],
             'icon' => ['required', 'string', 'max:60', 'regex:/^[a-z0-9_]+$/'],
             'color' => ['required', Rule::in(['primary', 'secondary', 'tertiary'])],
+            'metric' => ['required', Rule::in(array_keys(ProgressService::METRICS))],
+            'target_value' => ['nullable', 'required_unless:metric,manual', 'numeric', 'gt:0'],
             'show_on_home' => ['boolean'],
             'show_in_trophy_room' => ['boolean'],
             'sort_order' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'max:4096'],
         ], [
             'icon.regex' => 'Use the icon name in lowercase with underscores, e.g. military_tech.',
+            'target_value.required_unless' => 'Set the goal the rider has to reach to unlock this badge.',
         ]);
     }
 }

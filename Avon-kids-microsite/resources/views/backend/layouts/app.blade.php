@@ -69,8 +69,15 @@
                     onclick="document.body.classList.toggle('nav-open')" aria-label="Menu">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
+                <div class="topbar-title">
+                    <strong>@yield('title', 'Dashboard')</strong>
+                    <span>{{ now()->format('l, j F Y') }}</span>
+                </div>
                 <div class="topbar-right">
-                    <span class="topbar-user">{{ auth()->user()->name }}</span>
+                    <span class="topbar-user">
+                        <span class="initial">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                        <span class="name">{{ auth()->user()->name }}</span>
+                    </span>
                     <form method="POST" action="{{ route('admin.logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="btn btn-light btn-sm">

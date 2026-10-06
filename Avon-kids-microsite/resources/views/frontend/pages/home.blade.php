@@ -40,11 +40,7 @@
                                 <div class="top-player">
                                     <div class="player-info">
                                         <span class="rank font-headline-sm">1</span>
-                                        @if ($champion->avatar_url)
-                                            <img alt="Champion" src="{{ $champion->avatar_url }}" />
-                                        @else
-                                            <div class="avatar-placeholder bg-secondary font-label-lg">{{ $champion->initials }}</div>
-                                        @endif
+                                        <img alt="{{ $champion->name }}" src="{{ $champion->avatar_or_placeholder }}" />
                                         <div class="details">
                                             <p class="name font-headline-sm">{{ $champion->name }}</p>
                                             <p class="badge font-label-sm">

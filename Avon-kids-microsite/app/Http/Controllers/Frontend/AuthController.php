@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -14,5 +16,12 @@ class AuthController extends Controller
     public function showLogin(): View
     {
         return view('frontend.pages.login');
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        $request->session()->forget('rider_id');
+
+        return redirect()->route('login');
     }
 }

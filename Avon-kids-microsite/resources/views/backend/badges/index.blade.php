@@ -59,7 +59,11 @@
                                     <span class="pill pill-off">Hidden</span>
                                 @endif
                             </td>
-                            <td class="num">{{ $badge->unlocked_count }} {{ str('rider')->plural($badge->unlocked_count) }}</td>
+                            <td class="num" style="white-space:nowrap">
+                                @if ($badge->is_auto)
+                                    <span class="pill tone-blue" title="{{ \App\Support\ProgressService::METRICS[$badge->metric] }}">Auto · {{ \App\Support\Format::number($badge->target_value) }}{{ $badge->metric === 'distance' ? ' km' : '' }}</span><br>
+                                @endif
+                                {{ $badge->unlocked_count }} {{ str('rider')->plural($badge->unlocked_count) }}</td>
                             <td class="actions">
                                 <div class="row-actions">
                                     <a href="{{ route('admin.badges.edit', $badge) }}" class="btn btn-light btn-sm">

@@ -16,7 +16,7 @@ class AdminUserSeeder extends Seeder
     {
         User::firstOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@kidsavon.com')],
-            ['name' => 'Kids Avon Admin', 'password' => env('ADMIN_PASSWORD', 'password')],
+            ['name' => 'Admin', 'password' => env('ADMIN_PASSWORD', 'password')],
         );
     }
 }

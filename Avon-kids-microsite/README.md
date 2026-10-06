@@ -93,12 +93,46 @@ up together with the database.
 Icons are [Material Symbols](https://fonts.google.com/icons) names
 (e.g. `directions_bike`); the forms show a live preview.
 
+## How progress works
+
+Only **verified** rides count. Progress updates automatically whenever a ride is
+uploaded, verified, rejected, edited or deleted, and when a challenge or badge
+rule changes (`app/Support/ProgressService.php`).
+
+Each challenge and badge has a **"How progress is counted"** rule:
+
+| Rule | Counts |
+|---|---|
+| Verified distance (km) | Sum of km |
+| Number of verified rides | Rides |
+| Number of different days ridden | Distinct ride dates |
+| Rides started before 9:00 AM | Rides with a ride time before 9:00 |
+| Set by admin | Nothing automatic: set it on the rider's page |
+
+- **Challenges** count rides between their start and end dates (or from the day
+  the rider joined). Reaching the goal marks it Completed, alerts the rider and
+  unlocks the challenge's reward badge, if one is set. If a ride is rejected
+  later, the challenge re-opens.
+- **Badges** with an automatic rule count all-time rides and unlock by
+  themselves at the goal. A badge is never locked again automatically.
+- Riders join challenges with **Accept Challenge**; **Log Progress** opens the
+  upload form. Challenges are only shown while live and within their dates.
+
+## Website features
+
+Upload Ride (saved as pending with the photo proof, validated, duplicate
+check, new mobile numbers create a new rider), Accept Challenge, Log Progress,
+My Progress, View All History (with filters), Trophy Room, notifications
+(unread count in the header, marked seen when opened), Settings (name and
+photo), Log Out.
+
+The site runs on India time (`APP_TIMEZONE=Asia/Kolkata`), so "today" and
+"before 9 AM" match the riders' clocks.
+
 ## Not built yet
 
 - **Mobile + OTP login.** Pages are shown for a demo rider ("Alex Rider",
-  mobile from `DEMO_RIDER_MOBILE`, default `9999999999`). When login stores
+  mobile from `DEMO_RIDER_MOBILE`, default `9999999999`). When OTP login stores
   `session('rider_id')`, every page switches to that rider automatically (see
-  `app/Support/CurrentRider.php`).
-- **Saving uploaded rides.** The upload form displays but doesn't save yet;
-  `RideController` has a TODO for the `store` action.
-- **Accept challenge / Log progress** buttons, Settings link, "View All History".
+  `app/Support/CurrentRider.php`). The upload form's OTP field is shown but not
+  checked yet (`Frontend\RideController@store` has a TODO).

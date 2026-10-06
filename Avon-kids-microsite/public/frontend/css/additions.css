@@ -1,0 +1,295 @@
+/*
+ * Kids Avon – additions to the original design (style.css is left unchanged).
+ * Flash messages, form errors, file preview, challenge states, unread dot, pagination.
+ */
+
+/* ---------- Flash messages ---------- */
+.site-flash {
+    max-width: 1200px;
+    margin: 16px auto 0;
+    padding: 0 var(--spacing-margin-mobile);
+}
+
+.site-flash .flash {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 700;
+    border: 2px solid transparent;
+}
+
+.site-flash .flash .material-symbols-outlined { font-size: 24px; flex-shrink: 0; }
+.site-flash .flash-success { background: #e8f8e6; color: var(--color-secondary); border-color: #b8e8b2; }
+.site-flash .flash-error { background: #fff0ee; color: var(--color-primary); border-color: var(--color-primary-fixed); }
+
+/* ---------- Form errors ---------- */
+.field-error {
+    display: block;
+    margin-top: 6px;
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.input-group.has-error .input-wrapper,
+.input-group.has-error .file-upload-wrapper {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px rgba(188, 1, 0, 0.12);
+}
+
+.form-note {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-on-surface-variant);
+    margin: 6px 0 0;
+}
+
+/* ---------- File upload preview ---------- */
+.file-upload-wrapper .file-chosen {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: var(--color-on-surface);
+    text-align: left;
+}
+
+.file-upload-wrapper.has-file .file-chosen { display: flex; }
+.file-upload-wrapper.has-file .upload-placeholder { display: none; }
+
+.file-upload-wrapper .file-chosen img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.file-upload-wrapper .file-chosen small {
+    display: block;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+}
+
+/* ---------- Challenge card states ---------- */
+.challenges-page .challenge-card form { margin: 0; }
+
+.challenges-page .challenge-card a.btn { text-decoration: none; box-sizing: border-box; }
+
+.challenges-page .challenge-card .btn.btn-done {
+    background-color: #e3f6e0 !important;
+    color: var(--color-secondary) !important;
+    border: 2px solid #9fdc98 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    cursor: default;
+    gap: 6px;
+}
+
+.challenges-page .challenge-card.completed .card-top::after {
+    content: 'Completed';
+    position: absolute;
+    left: 16px;
+    bottom: 12px;
+    padding: 2px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--color-secondary);
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 22px;
+    font-weight: 800;
+}
+
+.challenges-page .challenge-card .card-top { position: relative; }
+
+.challenge-dates {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: -4px 0 12px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: var(--color-on-surface-variant);
+}
+
+.challenge-dates .material-symbols-outlined { font-size: 16px; }
+
+.challenges-empty {
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: var(--color-on-surface-variant);
+    grid-column: 1 / -1;
+    padding: 40px 0;
+}
+
+/* ---------- Header: unread alerts dot ---------- */
+.icon-btn { position: relative; }
+
+.icon-btn .unread-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--color-primary-container);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 11px;
+    line-height: 18px;
+    font-weight: 800;
+    text-align: center;
+    box-sizing: border-box;
+    border: 2px solid #fff;
+}
+
+/* ---------- Ride history pagination ---------- */
+.history-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: var(--spacing-md);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: var(--color-on-surface-variant);
+}
+
+.history-pagination a,
+.history-pagination span.disabled {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--color-surface-container-low);
+    color: var(--color-tertiary);
+    text-decoration: none;
+}
+
+.history-pagination span.disabled { opacity: 0.45; }
+.history-pagination a:hover { background: var(--color-surface-container-high); }
+
+.history-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: var(--spacing-md);
+}
+
+.history-filters a {
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 2px solid var(--color-surface-container-high);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 700;
+    color: var(--color-on-surface-variant);
+    text-decoration: none;
+}
+
+.history-filters a.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+.ride-reason {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* ---------- Rider settings ---------- */
+.settings-avatar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.settings-avatar img,
+.settings-avatar .initials {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--color-primary-fixed);
+    color: var(--color-primary);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-headline);
+    font-size: 26px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.settings-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.settings-stats span {
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: var(--color-surface-container-low);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 700;
+    color: var(--color-on-surface-variant);
+}
+
+/* ---------- Mobile fix for the original home grid ----------
+ * The 1fr column grew to the width of its widest child, so on phones the
+ * leaderboard scores, progress % and banners were cut off on the right. */
+.dashboard-content .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+.dashboard-content .dashboard-grid > * { min-width: 0; }
+
+@media (min-width: 768px) {
+    .dashboard-content .dashboard-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+}
+
+/* Same fix for the Ride Verification box. */
+.verification-section .verification-content { grid-template-columns: minmax(0, 1fr); }
+.verification-section .verification-content > * { min-width: 0; }
+.verification-section { overflow: hidden; }
+
+@media (max-width: 767px) {
+    .verification-section .example-area { padding: 22px; }
+}
+
+@media (min-width: 768px) {
+    .verification-section .verification-content { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+    .verification-section .info-area .section-title-left { font-size: 38px; min-width: 0; }
+    .verification-section .info-area .header { flex-wrap: wrap; }
+}

@@ -15,6 +15,12 @@ class Rider extends Model
 
     protected $hidden = ['otp'];
 
+    /** Same defaults as the database, so new riders are active straight away. */
+    protected $attributes = [
+        'level' => 1,
+        'is_active' => true,
+    ];
+
     protected function casts(): array
     {
         return [
@@ -61,6 +67,20 @@ class Rider extends Model
     public function getAvatarUrlAttribute(): ?string
     {
         return Uploads::url($this->avatar);
+    }
+
+    /** Photo URL, or a generated initials circle when the rider has no photo. */
+    public function getAvatarOrPlaceholderAttribute(): string
+    {
+        if ($this->avatar_url) {
+            return $this->avatar_url;
+        }
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" rx="40" fill="#ffdad4"/>'
+            .'<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#bc0100">'
+            .e($this->initials).'</text></svg>';
+
+        return 'data:image/svg+xml;base64,'.base64_encode($svg);
     }
 
     public function getLevelTitleAttribute(): string

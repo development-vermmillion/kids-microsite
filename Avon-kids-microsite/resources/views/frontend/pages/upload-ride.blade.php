@@ -3,6 +3,11 @@
 @section('title', 'Upload Ride')
 @section('body_class', 'ride-page')
 
+@php
+    // Small helper to add the error state + message to a field.
+    $err = fn (string $field) => $errors->has($field) ? 'has-error' : '';
+@endphp
+
 @section('content')
     <!-- Upload Form Content -->
     <div class="upload-content">
@@ -15,74 +20,95 @@
                 <p class="font-body-lg text-variant">Share your latest adventure to earn points and badges!</p>
             </div>
 
-            {{-- TODO: switch to method="POST" + enctype="multipart/form-data" with a rides.store route. --}}
-            <form class="upload-form" action="{{ route('home') }}">
+            <form class="upload-form" method="POST" action="{{ route('rides.store') }}" enctype="multipart/form-data" novalidate>
+                @csrf
                 <div class="form-grid">
-                    <div class="input-group">
+                    <div class="input-group {{ $err('mobile') }}">
                         <label class="font-label-lg" for="mobile">Mobile Number</label>
                         <div class="input-wrapper">
                             <span class="input-icon material-symbols-outlined">smartphone</span>
                             <input id="mobile" name="mobile" type="tel" placeholder="Enter mobile number" required
-                                value="{{ $currentRider?->mobile }}" class="font-body-lg" />
+                                inputmode="numeric" maxlength="14" value="{{ old('mobile', $currentRider?->mobile) }}"
+                                class="font-body-lg" />
                         </div>
+                        @error('mobile')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
+                    {{-- OTP verification is not built yet; the field is shown but not checked. --}}
                     <div class="input-group otp-group">
                         <label class="font-label-lg" for="otp">OTP Verification</label>
                         <div class="otp-wrapper">
                             <div class="input-wrapper">
                                 <span class="input-icon material-symbols-outlined">password</span>
-                                <input id="otp" name="otp" type="text" placeholder="Enter OTP" required class="font-body-lg" />
+                                <input id="otp" name="otp" type="text" placeholder="Enter OTP" inputmode="numeric"
+                                    class="font-body-lg" />
                             </div>
                             <button type="button" class="btn-send-otp font-label-lg chunky-shadow-small">Send OTP</button>
                         </div>
                     </div>
 
-                    <div class="input-group full-width">
+                    <div class="input-group full-width {{ $err('name') }}">
                         <label class="font-label-lg" for="name">Rider Name</label>
                         <div class="input-wrapper">
                             <span class="input-icon material-symbols-outlined">person</span>
                             <input id="name" name="name" type="text" placeholder="Enter rider name" required
-                                value="{{ $currentRider?->name }}" class="font-body-lg" />
+                                value="{{ old('name', $currentRider?->name) }}" class="font-body-lg" />
                         </div>
+                        @error('name')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group {{ $err('ride_date') }}">
                         <label class="font-label-lg" for="date">Ride Date</label>
                         <div class="input-wrapper">
                             <span class="input-icon material-symbols-outlined">calendar_today</span>
                             <input id="date" name="ride_date" type="date" required max="{{ now()->toDateString() }}"
-                                class="font-body-lg" />
+                                value="{{ old('ride_date') }}" class="font-body-lg" />
                         </div>
+                        @error('ride_date')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group {{ $err('distance_km') }}">
                         <label class="font-label-lg" for="distance">Ride Distance (km)</label>
                         <div class="input-wrapper">
                             <span class="input-icon material-symbols-outlined">directions_bike</span>
-                            <input id="distance" name="distance_km" type="number" step="0.1" placeholder="e.g. 5.5"
-                                required class="font-body-lg" />
+                            <input id="distance" name="distance_km" type="number" step="0.1" min="0.1" placeholder="e.g. 5.5"
+                                required value="{{ old('distance_km') }}" class="font-body-lg" />
                         </div>
+                        @error('distance_km')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
-                    <div class="input-group full-width">
+                    <div class="input-group full-width {{ $err('ride_time') }}">
                         <label class="font-label-lg" for="time">Ride Time</label>
                         <div class="input-wrapper">
                             <span class="input-icon material-symbols-outlined">timer</span>
-                            <input id="time" name="ride_time" type="time" required class="font-body-lg" />
+                            <input id="time" name="ride_time" type="time" required value="{{ old('ride_time') }}"
+                                class="font-body-lg" />
                         </div>
+                        @error('ride_time')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
-                    <div class="input-group full-width file-upload-group">
+                    <div class="input-group full-width file-upload-group {{ $err('proof_image') }}">
                         <label class="font-label-lg" for="proof">Photo Proof</label>
-                        <div class="file-upload-wrapper">
-                            <input id="proof" name="proof_image" type="file" accept="image/*" class="file-input" />
+                        <div class="file-upload-wrapper" id="proof-wrapper">
+                            <input id="proof" name="proof_image" type="file" accept="image/png,image/jpeg,image/webp"
+                                class="file-input" required />
                             <div class="upload-placeholder">
                                 <span class="material-symbols-outlined icon">add_photo_alternate</span>
                                 <p class="font-body-md text-main">Click to upload screenshot or photo</p>
                                 <p class="font-label-sm text-variant">Supports JPG, PNG</p>
                             </div>
+                            <div class="file-chosen">
+                                <img id="proof-preview" alt="" />
+                                <div>
+                                    <span id="proof-name"></span>
+                                    <small>Tap to choose a different picture</small>
+                                </div>
+                            </div>
                         </div>
+                        @error('proof_image')<span class="field-error">{{ $message }}</span>@enderror
+                        @if ($errors->any() && ! $errors->has('proof_image'))
+                            <p class="form-note">For safety, please choose your picture again.</p>
+                        @endif
                     </div>
                 </div>
 
@@ -94,3 +120,20 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        // Show the chosen picture inside the upload box.
+        document.getElementById('proof').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const wrapper = document.getElementById('proof-wrapper');
+            if (!file) {
+                wrapper.classList.remove('has-file');
+                return;
+            }
+            document.getElementById('proof-name').textContent = file.name;
+            document.getElementById('proof-preview').src = URL.createObjectURL(file);
+            wrapper.classList.add('has-file');
+        });
+    </script>
+@endpush

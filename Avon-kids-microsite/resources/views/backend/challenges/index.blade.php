@@ -46,7 +46,18 @@
                                 </div>
                             </td>
                             <td>{{ Format::number($challenge->target_value) }} {{ $challenge->unit ?: '' }}
-                                <div class="muted" style="font-size:12px">{{ $challenge->progress_label }}</div></td>
+                                <div class="muted" style="font-size:12px">
+                                    @if ($challenge->is_auto)
+                                        <span class="pill tone-blue" style="padding:1px 7px">Auto</span>
+                                        {{ \App\Support\ProgressService::METRICS[$challenge->metric] }}
+                                    @else
+                                        {{ $challenge->progress_label }} · set by admin
+                                    @endif
+                                </div>
+                                @if ($challenge->badge)
+                                    <div class="muted" style="font-size:12px">Unlocks: {{ $challenge->badge->name }}</div>
+                                @endif
+                            </td>
                             <td class="num">{{ number_format($challenge->reward_points) }} pts</td>
                             <td class="muted" style="font-size:13px">
                                 @if ($challenge->starts_at || $challenge->ends_at)

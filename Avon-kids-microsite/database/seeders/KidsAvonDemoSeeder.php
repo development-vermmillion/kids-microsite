@@ -7,6 +7,7 @@ use App\Models\Challenge;
 use App\Models\Faq;
 use App\Models\Rider;
 use App\Models\Setting;
+use App\Support\ProgressService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
@@ -26,9 +27,12 @@ class KidsAvonDemoSeeder extends Seeder
         $this->seedSettings();
         $this->seedFaqs();
         $badges = $this->seedBadges();
-        $challenges = $this->seedChallenges();
+        $challenges = $this->seedChallenges($badges);
         $this->seedLeaderboardRiders();
         $this->seedDemoRider($badges, $challenges);
+
+        // Work out everyone's automatic challenge and badge progress from their rides.
+        app(ProgressService::class)->recalculateAll();
     }
 
     private function seedSettings(): void
@@ -76,6 +80,11 @@ class KidsAvonDemoSeeder extends Seeder
             ['Century Club', 'Ride a total of 100km.', 'directions_bike', 'primary', null, false, true],
         ];
 
+        // Badges that unlock automatically from verified rides: name => [metric, target].
+        $automatic = [
+            'Century Club' => ['distance', 100],
+        ];
+
         $badges = [];
         foreach ($rows as $i => [$name, $description, $icon, $color, $image, $home, $trophy]) {
             $badges[$name] = Badge::create([
@@ -86,6 +95,8 @@ class KidsAvonDemoSeeder extends Seeder
                 'image' => $image,
                 'show_on_home' => $home,
                 'show_in_trophy_room' => $trophy,
+                'metric' => $automatic[$name][0] ?? 'manual',
+                'target_value' => $automatic[$name][1] ?? null,
                 'sort_order' => $i + 1,
             ]);
         }
@@ -93,17 +104,24 @@ class KidsAvonDemoSeeder extends Seeder
         return $badges;
     }
 
-    /** @return array<string, Challenge> */
-    private function seedChallenges(): array
+    /**
+     * @param  array<string, Badge>  $badges
+     * @return array<string, Challenge>
+     */
+    private function seedChallenges(array $badges): array
     {
+        $week = [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()];
+        $month = [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()];
+
+        // title, description, icon, colour, points, goal, unit, label, metric, [start, end], reward badge
         $rows = [
-            ['10km Weekly Milestone', 'Ride a total of 10 kilometers this week to earn the Explorer Badge!', 'map', 'primary', 500, 10, 'km', 'Progress'],
-            ['Park Hopper', 'Visit 3 different local parks on your rides this weekend.', 'nature_people', 'tertiary', 300, 3, null, 'Parks Visited'],
-            ['Early Bird Special', 'Complete 3 morning rides before 9:00 AM this month.', 'wb_sunny', 'secondary', 800, 3, null, 'Morning Rides'],
+            ['10km Weekly Milestone', 'Ride a total of 10 kilometers this week to earn the Explorer Badge!', 'map', 'primary', 500, 10, 'km', 'Progress', 'distance', $week, 'Explorer'],
+            ['Park Hopper', 'Visit 3 different local parks on your rides this weekend.', 'nature_people', 'tertiary', 300, 3, null, 'Parks Visited', 'manual', [null, null], 'Park Hopper'],
+            ['Early Bird Special', 'Complete 3 morning rides before 9:00 AM this month.', 'wb_sunny', 'secondary', 800, 3, null, 'Morning Rides', 'morning_rides', $month, 'Early Bird'],
         ];
 
         $challenges = [];
-        foreach ($rows as $i => [$title, $description, $icon, $color, $points, $target, $unit, $label]) {
+        foreach ($rows as $i => [$title, $description, $icon, $color, $points, $target, $unit, $label, $metric, $dates, $badge]) {
             $challenges[$title] = Challenge::create([
                 'title' => $title,
                 'description' => $description,
@@ -113,6 +131,10 @@ class KidsAvonDemoSeeder extends Seeder
                 'target_value' => $target,
                 'unit' => $unit,
                 'progress_label' => $label,
+                'metric' => $metric,
+                'badge_id' => $badges[$badge]->id,
+                'starts_at' => $dates[0],
+                'ends_at' => $dates[1],
                 'sort_order' => $i + 1,
             ]);
         }
@@ -183,10 +205,19 @@ class KidsAvonDemoSeeder extends Seeder
             ['Neighbourhood Loop', '2024-09-28', 3.0, 20, 'verified', null],
             ['Morning Warm-up', '2024-09-21', 2.5, 15, 'verified', null],
         ];
-        foreach ($rides as [$title, $date, $km, $minutes, $status, $reason]) {
+        // This week's rides (count towards the 10km Weekly Milestone: 6.5 / 10 km).
+        $today = Carbon::today()->toDateString();
+        array_unshift($rides,
+            ['Morning Park Ride', $today, 4.0, 25, 'verified', null, '07:45'],
+            ['Evening Spin', $today, 2.5, 18, 'verified', null, '18:10'],
+        );
+
+        foreach ($rides as $ride) {
+            [$title, $date, $km, $minutes, $status, $reason] = $ride;
             $alex->rides()->create([
                 'title' => $title,
                 'ride_date' => $date,
+                'ride_time' => $ride[6] ?? '16:30',
                 'distance_km' => $km,
                 'duration_minutes' => $minutes,
                 'status' => $status,
@@ -205,14 +236,14 @@ class KidsAvonDemoSeeder extends Seeder
             'Park Hopper' => ['unlocked_at' => '2026-06-28', 'progress_percent' => 100],
             'Early Bird' => ['unlocked_at' => null, 'progress_percent' => 0],
             'Social Butterfly' => ['unlocked_at' => null, 'progress_percent' => 40],
-            'Century Club' => ['unlocked_at' => null, 'progress_percent' => 75],
+            'Century Club' => ['unlocked_at' => null, 'progress_percent' => 0], // calculated from rides
         ];
         foreach ($badgeState as $name => $pivot) {
             $alex->badges()->attach($badges[$name]->id, $pivot);
         }
 
         // Challenges Alex has already accepted.
-        $alex->challenges()->attach($challenges['10km Weekly Milestone']->id, ['progress_value' => 6.5]);
+        $alex->challenges()->attach($challenges['10km Weekly Milestone']->id, ['progress_value' => 0]);
         $alex->challenges()->attach($challenges['Park Hopper']->id, ['progress_value' => 1]);
 
         // Notifications.

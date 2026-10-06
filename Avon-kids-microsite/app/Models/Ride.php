@@ -37,6 +37,18 @@ class Ride extends Model
         return $query->where('status', self::STATUS_VERIFIED);
     }
 
+    /** Always store ride_time as HH:MM:SS so "before 9 AM" comparisons work. */
+    public function setRideTimeAttribute($value): void
+    {
+        $this->attributes['ride_time'] = $value ? \Illuminate\Support\Carbon::parse($value)->format('H:i:s') : null;
+    }
+
+    /** Title shown on the website and in the admin: "Weekend Trail Explorer" or "Ride on 12 Oct". */
+    public function getDisplayTitleAttribute(): string
+    {
+        return $this->title ?: 'Ride on '.$this->ride_date->format('j M');
+    }
+
     public function getProofUrlAttribute(): ?string
     {
         return Uploads::url($this->proof_image);

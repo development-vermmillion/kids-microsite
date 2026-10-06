@@ -62,7 +62,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ $ride->title ?: '—' }}</td>
+                            <td class="{{ $ride->title ? '' : 'muted' }}">{{ $ride->display_title }}</td>
                             <td>{{ $ride->ride_date->format('d M Y') }}</td>
                             <td class="num">{{ Format::km($ride->distance_km) }} km</td>
                             <td class="num muted">{{ $ride->duration_label ?? '—' }}</td>
