@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Str;
+use App\Support\Uploads;
 
 class Badge extends Model
 {
@@ -28,15 +28,9 @@ class Badge extends Model
             ->withTimestamps();
     }
 
-    /** Accepts either a file name inside public/frontend/images or a full URL. */
+    /** Accepts a file name inside public/frontend/images, an uploads/ path, or a full URL. */
     public function getImageUrlAttribute(): ?string
     {
-        if (! $this->image) {
-            return null;
-        }
-
-        return Str::startsWith($this->image, ['http://', 'https://'])
-            ? $this->image
-            : asset('frontend/images/'.$this->image);
+        return Uploads::url($this->image);
     }
 }

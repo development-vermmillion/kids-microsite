@@ -15,7 +15,7 @@
         </a>
         @if ($currentRider)
             <div class="user-profile" onclick="this.classList.toggle('menu-active')">
-                <img alt="User Avatar" src="{{ $currentRider->avatar }}" />
+                <img alt="User Avatar" src="{{ $currentRider->avatar_url }}" />
                 <div class="user-info">
                     <p class="user-name font-label-lg">{{ $currentRider->name }}</p>
                     <p class="user-level font-label-sm">{{ $currentRider->level_title }}</p>

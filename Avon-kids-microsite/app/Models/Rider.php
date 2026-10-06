@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Uploads;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -55,6 +56,11 @@ class Rider extends Model
             ->take(2)
             ->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))
             ->implode('');
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return Uploads::url($this->avatar);
     }
 
     public function getLevelTitleAttribute(): string

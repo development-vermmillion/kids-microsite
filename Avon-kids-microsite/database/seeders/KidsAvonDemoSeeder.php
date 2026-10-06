@@ -131,8 +131,20 @@ class KidsAvonDemoSeeder extends Seeder
             ['Emma P.', '9000000005', null, 9, [16, 15]],
         ];
 
-        foreach ($riders as [$name, $mobile, $avatar, $level, $rides]) {
+        foreach ($riders as $index => [$name, $mobile, $avatar, $level, $rides]) {
             $rider = Rider::create(compact('name', 'mobile', 'avatar', 'level'));
+
+            // A couple of uploads waiting in the admin review queue.
+            if (in_array($index, [1, 2], true)) {
+                $rider->rides()->create([
+                    'title' => $index === 1 ? 'Evening Lake Loop' : 'Ride to Grandma\'s',
+                    'ride_date' => Carbon::yesterday(),
+                    'ride_time' => '17:30',
+                    'distance_km' => $index === 1 ? 6.2 : 3.5,
+                    'duration_minutes' => $index === 1 ? 32 : 20,
+                    'status' => 'pending',
+                ]);
+            }
 
             foreach ($rides as $i => $km) {
                 $rider->rides()->create([

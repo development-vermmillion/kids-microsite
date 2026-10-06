@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Uploads;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,11 @@ class Ride extends Model
     public function scopeVerified(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_VERIFIED);
+    }
+
+    public function getProofUrlAttribute(): ?string
+    {
+        return Uploads::url($this->proof_image);
     }
 
     /** "1h 20m", "35m", "2h" */

@@ -18,6 +18,10 @@ php artisan migrate --seed            # creates tables + the demo content
 php artisan serve                     # http://localhost:8000
 ```
 
+Admin panel: **http://localhost:8000/admin**, sign in with `admin@kidsavon.com` /
+`password` (or set `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env` before seeding).
+Change the password straight away under **Admin users**.
+
 `--seed` fills the database with the placeholder content from the original HTML
 design (riders, rides, badges, challenges, notifications, FAQs) so every page
 renders. To reset: `php artisan migrate:fresh --seed`.
@@ -64,10 +68,30 @@ The original static HTML is kept for reference in `docs/original-html`
 | `rider_notifications` | Alerts shown on the notifications page |
 | `faqs` | Home page FAQ section |
 | `settings` | Site-wide values: community miles counter, community goal, support email |
-| `users` | Reserved for admin accounts |
+| `users` | Admin accounts |
 
 Numbers on the pages are calculated from this data: leaderboard = verified km
 per rider, "Next Badge" = the locked badge with the highest progress, and so on.
+
+## Admin panel (`/admin`)
+
+| Section | What you can do |
+|---|---|
+| Dashboard | Rides waiting for review, rider count, verified km, active challenges, Hall of Fame |
+| Ride review | Filter pending / verified / rejected, search, view the photo proof, **Verify** or **Reject with a reason** (the rider gets an alert either way, and you jump to the next ride in the queue), add/edit/delete rides |
+| Riders | Add/edit/delete riders (name, mobile, level, photo, active), see their rides and stats, unlock badges or set badge progress (new badges send an alert), join them to challenges and set progress |
+| Challenges | Add/edit/delete challenges: title, description, goal + unit, reward points, icon, colour, dates, order, live/hidden |
+| Badges & trophies | Add/edit/delete badges, upload the home page badge image, choose home page and/or Trophy Room |
+| Notifications | Send an alert to all riders or one rider; see whether it has been seen |
+| FAQs | Edit the home page FAQ section |
+| Site settings | Community Miles counter, community goal and progress, support email |
+| Admin users | Add admins, change passwords |
+
+Uploaded images are saved in `public/uploads` (not in git); back that folder
+up together with the database.
+
+Icons are [Material Symbols](https://fonts.google.com/icons) names
+(e.g. `directions_bike`); the forms show a live preview.
 
 ## Not built yet
 
@@ -78,4 +102,3 @@ per rider, "Next Badge" = the locked badge with the highest progress, and so on.
 - **Saving uploaded rides.** The upload form displays but doesn't save yet;
   `RideController` has a TODO for the `store` action.
 - **Accept challenge / Log progress** buttons, Settings link, "View All History".
-- **Admin panel.** Goes in the Backend folders listed above.
