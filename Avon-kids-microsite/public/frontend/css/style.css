@@ -514,7 +514,7 @@ img {
 }
 
 .girl-background-banner {
-    background: url('images/background-img1.png') center/cover no-repeat;
+    background: url('../images/background-img1.png') center/cover no-repeat;
     border-radius: 16px;
     padding: 24px;
     /* Added padding to ensure text doesn't touch the edges of the background */
@@ -1656,7 +1656,7 @@ img {
 .verification-section {
     grid-column: 1 / -1;
     margin-top: var(--spacing-xl);
-    background: url('images/ride-verify-banner.png') center/cover no-repeat;
+    background: url('../images/ride-verify-banner.png') center/cover no-repeat;
     border-radius: 32px;
     padding: var(--spacing-lg);
     border: 1px solid var(--color-outline-variant);
@@ -2373,7 +2373,7 @@ img {
 
 /* --- Footer --- */
 .site-footer {
-    background: linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.1)), url('images/footer-bg.png') center/cover no-repeat;
+    background: linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.1)), url('../images/footer-bg.png') center/cover no-repeat;
     /* border-top: 1px solid var(--color-outline-variant); */
     padding: 64px var(--spacing-margin-mobile);
     font-weight: 700;
@@ -2653,7 +2653,7 @@ img {
     align-items: center;
     justify-content: center;
     padding: var(--spacing-margin-mobile);
-    background: url('images/boy-rider2.png') center/cover no-repeat;
+    background: url('../images/boy-rider2.png') center/cover no-repeat;
     position: relative;
     overflow: hidden;
 
