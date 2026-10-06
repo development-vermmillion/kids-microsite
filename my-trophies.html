@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Kids Avon - My Trophies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
+</head>
+
+<body class="trophies-page">
+    <main class="app-container">
+        <!-- TopAppBar -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="brand">
+                    <div class="brand-logo font-headline-sm">K</div>
+                    <h1 class="brand-name font-headline-sm">Kids Avon</h1>
+                </div>
+                <!--div class="search-bar">
+                                        <span class="material-symbols-outlined search-icon">search</span>
+                                        <input class="font-body-md" placeholder="Search friends, trails..."
+                                                type="text" />
+                                </div-->
+            </div>
+            <div class="header-right">
+                <a href="notifications.html" class="icon-btn">
+                    <span class="material-symbols-outlined">notifications</span>
+                </a>
+                <a href="my-trophies.html" class="icon-btn">
+                    <span class="material-symbols-outlined">emoji_events</span>
+                </a>
+                <div class="user-profile" onclick="this.classList.toggle('menu-active')">
+                    <img alt="User Avatar"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuh7NkhUtOMFc6JuaD-jHCZTiP32zOtiFu92g3O7RbaDVr0qCpDefyljNFPRyl9Zmb86qrfOIrN_ao-6dhdhijoE2kU9aCEHg4UcmSZ0O2frhN5CQid38YwVPnGkOHxN488v4SKJPTOdjSwbQwnxMuomSUFiuEFRt3ITGTlLHvRE_K4IDttp9clDtwRJtJ_ey-VPdkoE2KWr5XOLmQQza9Koadbffoj_rHmRSheU6o5xf2zRQvQDS5" />
+                    <div class="user-info">
+                        <p class="user-name font-label-lg">Alex Rider</p>
+                        <p class="user-level font-label-sm">Level 12 Cyclist</p>
+                    </div>
+                    <span class="material-symbols-outlined hamburger-icon">menu</span>
+                    <div class="profile-dropdown soft-shadow">
+                        <a href="progress.html" class="dropdown-item font-body-md"><span
+                                class="material-symbols-outlined">trending_up</span> My
+                            Progress</a>
+                        <a href="active-challenges.html" class="dropdown-item font-body-md"><span
+                                class="material-symbols-outlined">flag</span>
+                            Challenges</a>
+
+                        <a href="#" class="dropdown-item font-body-md"><span
+                                class="material-symbols-outlined">settings</span>
+                            Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="login.html" class="dropdown-item logout font-body-md"><span
+                                class="material-symbols-outlined">logout</span> Log
+                            Out</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Trophies Content -->
+        <div class="trophies-content">
+            <div class="trophies-header">
+                <div class="header-icon-wrapper shadow-sm">
+                    <span class="material-symbols-outlined"
+                        style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                </div>
+                <h2 class="font-headline-lg">Trophy Room</h2>
+                <p class="font-body-lg text-variant">Look at all the amazing badges you've collected on your cycling
+                    journey!</p>
+            </div>
+
+            <div class="trophies-grid">
+
+                <!-- Trophy 1 (Unlocked) -->
+                <div class="trophy-card soft-shadow unlocked">
+                    <div class="trophy-icon-wrapper bg-primary-gradient shadow-glow">
+                        <span class="material-symbols-outlined trophy-icon"
+                            style="font-variation-settings: 'FILL' 1;">map</span>
+                    </div>
+                    <h3 class="font-headline-sm">Explorer</h3>
+                    <p class="font-body-md text-variant">Rode 10km in a single week.</p>
+                    <span class="date font-label-sm">Unlocked: Aug 2, 2026</span>
+                </div>
+
+                <!-- Trophy 2 (Unlocked) -->
+                <div class="trophy-card soft-shadow unlocked">
+                    <div class="trophy-icon-wrapper bg-secondary-gradient shadow-glow">
+                        <span class="material-symbols-outlined trophy-icon"
+                            style="font-variation-settings: 'FILL' 1;">speed</span>
+                    </div>
+                    <h3 class="font-headline-sm">Speedster</h3>
+                    <p class="font-body-md text-variant">Completed a 5km ride under 30 mins.</p>
+                    <span class="date font-label-sm">Unlocked: Jul 15, 2026</span>
+                </div>
+
+                <!-- Trophy 3 (Unlocked) -->
+                <div class="trophy-card soft-shadow unlocked">
+                    <div class="trophy-icon-wrapper bg-tertiary-gradient shadow-glow">
+                        <span class="material-symbols-outlined trophy-icon"
+                            style="font-variation-settings: 'FILL' 1;">nature_people</span>
+                    </div>
+                    <h3 class="font-headline-sm">Park Hopper</h3>
+                    <p class="font-body-md text-variant">Visited 3 different local parks.</p>
+                    <span class="date font-label-sm">Unlocked: Jun 28, 2026</span>
+                </div>
+
+                <!-- Trophy 4 (Locked) -->
+                <div class="trophy-card soft-shadow locked">
+                    <div class="trophy-icon-wrapper locked-bg">
+                        <span class="material-symbols-outlined trophy-icon">wb_sunny</span>
+                    </div>
+                    <h3 class="font-headline-sm">Early Bird</h3>
+                    <p class="font-body-md text-variant">Complete 3 morning rides before 9AM.</p>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill fill-neutral" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Trophy 5 (Locked) -->
+                <div class="trophy-card soft-shadow locked">
+                    <div class="trophy-icon-wrapper locked-bg">
+                        <span class="material-symbols-outlined trophy-icon">groups</span>
+                    </div>
+                    <h3 class="font-headline-sm">Social Butterfly</h3>
+                    <p class="font-body-md text-variant">Add 5 friends to your Kids Avon list.</p>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill fill-neutral" style="width: 40%;"></div>
+                    </div>
+                </div>
+
+                <!-- Trophy 6 (Locked) -->
+                <div class="trophy-card soft-shadow locked">
+                    <div class="trophy-icon-wrapper locked-bg">
+                        <span class="material-symbols-outlined trophy-icon">directions_bike</span>
+                    </div>
+                    <h3 class="font-headline-sm">Century Club</h3>
+                    <p class="font-body-md text-variant">Ride a total of 100km.</p>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill fill-neutral" style="width: 75%;"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer font-headline-sm">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="brand">
+                        <div class="logo font-headline-sm">K</div>
+                        <h2>Kids Avon</h2>
+                    </div>
+                    <p class="desc font-body-md">Empowering young cyclists to explore, achieve, and stay active
+                        together.</p>
+                    <div class="support">
+                        <span class="label font-label-sm">Help &amp; Support</span>
+                        <a class="font-body-md" href="mailto:avon@avoncycles.com">
+                            <span class="material-symbols-outlined icon">mail</span>
+                            avon@avoncycles.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>
+                        <span class="material-symbols-outlined icon-secondary">health_and_safety</span>
+                        Safety First
+                    </h3>
+                    <ul class="font-body-md">
+                        <li>• Wear a properly fitted helmet</li>
+                        <li>• Stay on designated bike paths</li>
+                        <li>• Use hand signals when turning</li>
+                        <li>• Ride with a buddy or adult</li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>
+                        <span class="material-symbols-outlined icon-tertiary">family_restroom</span>
+                        For Parents
+                    </h3>
+                    <p class="text-block font-body-md">Guardian consent is required. We prioritize safety with moderated
+                        features and private tracking.</p>
+                    <p class="text-block font-body-md"><span class="highlight">Activity:</span> Stay hydrated and check
+                        tire pressure before every ride!</p>
+                </div>
+
+                <div class="footer-col">
+                    <h3>
+                        <span class="material-symbols-outlined icon-neutral">quiz</span> Quick Links
+                    </h3>
+                    <nav class="font-body-md">
+                        <a href="#">How do I participate?</a>
+                        <a href="#">Do I need Strava?</a>
+                        <a href="#">Eligible Activities</a>
+                        <a href="#">Privacy &amp; Data</a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright font-label-sm">© 2024 Kids Avon. All rights reserved.</p>
+                <div class="legal-links font-label-sm">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

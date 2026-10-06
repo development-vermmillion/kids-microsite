@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Kids Avon - Upload Ride</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
+</head>
+
+<body class="ride-page">
+    <main class="app-container">
+        <!-- TopAppBar -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="brand">
+                    <div class="brand-logo font-headline-sm">K</div>
+                    <h1 class="brand-name font-headline-sm">Kids Avon</h1>
+                </div>
+                <!--div class="search-bar">
+                                        <span class="material-symbols-outlined search-icon">search</span>
+                                        <input class="font-body-md" placeholder="Search friends, trails..."
+                                                type="text" />
+                                </div-->
+            </div>
+            <div class="header-right">
+                <a href="notifications.html" class="icon-btn">
+                    <span class="material-symbols-outlined">notifications</span>
+                </a>
+                <a href="my-trophies.html" class="icon-btn">
+                    <span class="material-symbols-outlined">emoji_events</span>
+                </a>
+                <div class="user-profile" onclick="this.classList.toggle('menu-active')">
+                    <img alt="User Avatar"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuh7NkhUtOMFc6JuaD-jHCZTiP32zOtiFu92g3O7RbaDVr0qCpDefyljNFPRyl9Zmb86qrfOIrN_ao-6dhdhijoE2kU9aCEHg4UcmSZ0O2frhN5CQid38YwVPnGkOHxN488v4SKJPTOdjSwbQwnxMuomSUFiuEFRt3ITGTlLHvRE_K4IDttp9clDtwRJtJ_ey-VPdkoE2KWr5XOLmQQza9Koadbffoj_rHmRSheU6o5xf2zRQvQDS5" />
+                    <div class="user-info">
+                        <p class="user-name font-label-lg">Alex Rider</p>
+                        <p class="user-level font-label-sm">Level 12 Cyclist</p>
+                    </div>
+                    <span class="material-symbols-outlined hamburger-icon">menu</span>
+                    <div class="profile-dropdown soft-shadow">
+                        <a href="progress.html" class="dropdown-item font-body-md"><span
+                                class="material-symbols-outlined">trending_up</span> My
+                            Progress</a>
+                        <a href="active-challenges.html" class="dropdown-item font-body-md"><span
+                                class="material-symbols-outlined">flag</span>
+                            Challenges</a>
+
+                        <a href="#" class="dropdown-item font-body-md"><span
+                                class="material-symbols-outlined">settings</span>
+                            Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="login.html" class="dropdown-item logout font-body-md"><span
+                                class="material-symbols-outlined">logout</span> Log
+                            Out</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Upload Form Content -->
+        <div class="upload-content">
+            <div class="upload-card soft-shadow">
+                <div class="form-header">
+                    <div class="icon-circle shadow-sm">
+                        <span class="material-symbols-outlined icon"
+                            style="font-variation-settings: 'FILL' 1;">upload_file</span>
+                    </div>
+                    <h1 class="font-headline-lg">Upload Ride</h1>
+                    <p class="font-body-lg text-variant">Share your latest adventure to earn points and badges!</p>
+                </div>
+
+                <form class="upload-form" action="index.html">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label class="font-label-lg" for="mobile">Mobile Number</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon material-symbols-outlined">smartphone</span>
+                                <input id="mobile" type="tel" placeholder="Enter mobile number" required
+                                    class="font-body-lg" />
+                            </div>
+                        </div>
+
+                        <div class="input-group otp-group">
+                            <label class="font-label-lg" for="otp">OTP Verification</label>
+                            <div class="otp-wrapper">
+                                <div class="input-wrapper">
+                                    <span class="input-icon material-symbols-outlined">password</span>
+                                    <input id="otp" type="text" placeholder="Enter OTP" required class="font-body-lg" />
+                                </div>
+                                <button type="button" class="btn-send-otp font-label-lg chunky-shadow-small">Send
+                                    OTP</button>
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width">
+                            <label class="font-label-lg" for="name">Rider Name</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon material-symbols-outlined">person</span>
+                                <input id="name" type="text" placeholder="Enter rider name" required
+                                    class="font-body-lg" />
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="font-label-lg" for="date">Ride Date</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon material-symbols-outlined">calendar_today</span>
+                                <input id="date" type="date" required class="font-body-lg" />
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="font-label-lg" for="distance">Ride Distance (km)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon material-symbols-outlined">directions_bike</span>
+                                <input id="distance" type="number" step="0.1" placeholder="e.g. 5.5" required
+                                    class="font-body-lg" />
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width">
+                            <label class="font-label-lg" for="time">Ride Time</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon material-symbols-outlined">timer</span>
+                                <input id="time" type="time" required class="font-body-lg" />
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width file-upload-group">
+                            <label class="font-label-lg" for="proof">Photo Proof</label>
+                            <div class="file-upload-wrapper">
+                                <input id="proof" type="file" accept="image/*" class="file-input" />
+                                <div class="upload-placeholder">
+                                    <span class="material-symbols-outlined icon">add_photo_alternate</span>
+                                    <p class="font-body-md text-main">Click to upload screenshot or photo</p>
+                                    <p class="font-label-sm text-variant">Supports JPG, PNG</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="submit-btn font-headline-sm chunky-shadow-btn" type="submit">
+                        Submit Ride
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer font-headline-sm">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="brand">
+                        <div class="logo font-headline-sm">K</div>
+                        <h2>Kids Avon</h2>
+                    </div>
+                    <p class="desc font-body-md">Empowering young cyclists to explore, achieve, and stay active
+                        together.</p>
+                    <div class="support">
+                        <span class="label font-label-sm">Help &amp; Support</span>
+                        <a class="font-body-md" href="mailto:avon@avoncycles.com">
+                            <span class="material-symbols-outlined icon">mail</span>
+                            avon@avoncycles.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>
+                        <span class="material-symbols-outlined icon-secondary">health_and_safety</span>
+                        Safety First
+                    </h3>
+                    <ul class="font-body-md">
+                        <li>• Wear a properly fitted helmet</li>
+                        <li>• Stay on designated bike paths</li>
+                        <li>• Use hand signals when turning</li>
+                        <li>• Ride with a buddy or adult</li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>
+                        <span class="material-symbols-outlined icon-tertiary">family_restroom</span>
+                        For Parents
+                    </h3>
+                    <p class="text-block font-body-md">Guardian consent is required. We prioritize safety with moderated
+                        features and private tracking.</p>
+                    <p class="text-block font-body-md"><span class="highlight">Activity:</span> Stay hydrated and check
+                        tire pressure before every ride!</p>
+                </div>
+
+                <div class="footer-col">
+                    <h3>
+                        <span class="material-symbols-outlined icon-neutral">quiz</span> Quick Links
+                    </h3>
+                    <nav class="font-body-md">
+                        <a href="#">How do I participate?</a>
+                        <a href="#">Do I need Strava?</a>
+                        <a href="#">Eligible Activities</a>
+                        <a href="#">Privacy &amp; Data</a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright font-label-sm">© 2024 Kids Avon. All rights reserved.</p>
+                <div class="legal-links font-label-sm">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
