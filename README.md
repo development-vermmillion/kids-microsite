@@ -1,6 +1,6 @@
 # Avon Kids Microsite (Kids Avon)
 
-Laravel 11 app for the Avon Cycles kids' riding microsite. The rider-facing site
+Laravel 12 app for the Avon Cycles kids' riding microsite. The rider-facing site
 (frontend) and the admin panel (backend) live in this one app and share one
 database.
 
