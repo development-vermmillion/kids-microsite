@@ -41,11 +41,14 @@ class ProgressService
         $this->recalculateBadges($rider);
     }
 
-    /** Value of a metric for a rider's verified rides, optionally limited to a date window. */
-    public function metricValue(Rider $rider, string $metric, ?Carbon $from = null, ?Carbon $to = null): float
+    /**
+     * Value of a metric for a rider's rides, optionally limited to a date window.
+     * Counts verified rides by default; pass Ride::STATUS_PENDING to see what is waiting for review.
+     */
+    public function metricValue(Rider $rider, string $metric, ?Carbon $from = null, ?Carbon $to = null, string $status = Ride::STATUS_VERIFIED): float
     {
         $rides = $rider->rides()
-            ->where('status', Ride::STATUS_VERIFIED)
+            ->where('status', $status)
             ->when($from, fn ($q) => $q->whereDate('ride_date', '>=', $from))
             ->when($to, fn ($q) => $q->whereDate('ride_date', '<=', $to));
 
@@ -56,6 +59,42 @@ class ProgressService
             'morning_rides' => (float) $rides->whereNotNull('ride_time')->where('ride_time', '<', self::MORNING_CUTOFF)->count(),
             default => 0.0,
         };
+    }
+
+    /** Start of the counting window for a joined challenge: its start date, or the day the rider joined. */
+    public function challengeWindowStart(Challenge $challenge): Carbon
+    {
+        return $challenge->starts_at ?? Carbon::parse($challenge->pivot->created_at)->startOfDay();
+    }
+
+    /**
+     * How much of a joined challenge is waiting for review (pending rides inside its dates).
+     * Manual challenges have nothing pending.
+     */
+    public function pendingForChallenge(Rider $rider, Challenge $challenge): float
+    {
+        if ($challenge->metric === 'manual' || ! $challenge->pivot) {
+            return 0.0;
+        }
+
+        return $this->metricValue($rider, $challenge->metric, $this->challengeWindowStart($challenge), $challenge->ends_at, Ride::STATUS_PENDING);
+    }
+
+    /**
+     * Progress (0-100) towards a badge for any rider, including riders who have
+     * never touched it yet: automatic badges are worked out from their rides.
+     */
+    public function badgePercent(Rider $rider, Badge $badge, $pivot = null): int
+    {
+        if ($pivot?->unlocked_at) {
+            return 100;
+        }
+
+        if ($badge->is_auto) {
+            return (int) min(100, floor($this->metricValue($rider, $badge->metric) / (float) $badge->target_value * 100));
+        }
+
+        return (int) ($pivot->progress_percent ?? 0);
     }
 
     private function recalculateChallenges(Rider $rider): void
@@ -69,7 +108,7 @@ class ProgressService
             }
 
             // Window: the challenge's dates; without a start date, count from when the rider joined.
-            $from = $challenge->starts_at ?? Carbon::parse($challenge->pivot->created_at)->startOfDay();
+            $from = $this->challengeWindowStart($challenge);
             $value = $this->metricValue($rider, $challenge->metric, $from, $challenge->ends_at);
 
             $rider->challenges()->updateExistingPivot($challenge->id, ['progress_value' => $value]);

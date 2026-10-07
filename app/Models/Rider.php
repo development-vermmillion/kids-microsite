@@ -13,8 +13,6 @@ class Rider extends Model
         'name', 'mobile', 'avatar', 'level', 'is_active',
     ];
 
-    protected $hidden = ['otp'];
-
     /** Same defaults as the database, so new riders are active straight away. */
     protected $attributes = [
         'level' => 1,
@@ -24,7 +22,6 @@ class Rider extends Model
     protected function casts(): array
     {
         return [
-            'otp_expires_at' => 'datetime',
             'last_login_at' => 'datetime',
             'is_active' => 'boolean',
         ];

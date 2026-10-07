@@ -129,10 +129,26 @@ photo), Log Out.
 The site runs on India time (`APP_TIMEZONE=Asia/Kolkata`), so "today" and
 "before 9 AM" match the riders' clocks.
 
-## Not built yet
+## Rider login (mobile number + OTP)
 
-- **Mobile + OTP login.** Pages are shown for a demo rider ("Alex Rider",
-  mobile from `DEMO_RIDER_MOBILE`, default `9999999999`). When OTP login stores
-  `session('rider_id')`, every page switches to that rider automatically (see
-  `app/Support/CurrentRider.php`). The upload form's OTP field is shown but not
-  checked yet (`Frontend\RideController@store` has a TODO).
+- **Log in:** `/login`, enter mobile number, tap **Send OTP**, enter the OTP.
+- **Join:** `/join` (“Join the Adventure”): name + mobile number + OTP.
+- **Upload Ride without logging in:** guests confirm their number with an OTP
+  on the form; a new number creates a rider, and they are logged in after.
+- Progress, ride history, trophies, alerts, settings and joining challenges need
+  a logged-in rider; other pages are open to everyone.
+
+**Testing mode:** while `OTP_TEST_CODE=1234` is set in `.env` (the default),
+every OTP is **1234** and no SMS is sent. Demo rider: mobile `9999999999`.
+
+**Before launch:** set `OTP_TEST_CODE=` (empty) and connect an SMS provider
+(e.g. MSG91 or Twilio) in `sendSms()` in `app/Support/OtpService.php`.
+OTPs last 10 minutes, allow 5 tries, and can be sent 3 times a minute per
+number.
+
+## Progress while rides wait for review
+
+New uploads appear straight away on the rider's progress page, challenge cards
+and home page as **“waiting for review”** (a striped part of the progress bar).
+They count once the admin verifies them. To count rides immediately, tick
+**Count rides as soon as they are uploaded** in Admin → Site settings.

@@ -1,6 +1,6 @@
 @extends('frontend.layouts.base')
 
-@section('title', 'Login')
+@section('title', $mode === 'join' ? 'Join the Adventure' : 'Login')
 @section('body_class', 'login-page-design')
 
 @section('body')
@@ -24,56 +24,105 @@
         <!-- Form Side -->
         <div class="form-side">
             <div class="form-header">
-                <div class="icon-circle shadow-sm" style="width: 100px; height: auto; background-color: #fff;">
+                <a href="{{ route('home') }}" class="icon-circle shadow-sm" style="width: 100px; height: auto; background-color: #fff;">
                     <img src="{{ asset('frontend/images/avon-new-logo.jpeg') }}"
                         style="width: 100px; height: auto; background-color: #fff;" alt="Avon">
-                </div>
-                <h1 class="font-headline-lg">Welcome Back, Rider!</h1>
-                <p class="font-body-lg">Ready for another adventure?</p>
+                </a>
+                @if ($mode === 'join')
+                    <h1 class="font-headline-lg">Join the Adventure!</h1>
+                    <p class="font-body-lg">Create your rider account in a few seconds.</p>
+                @else
+                    <h1 class="font-headline-lg">Welcome Back, Rider!</h1>
+                    <p class="font-body-lg">Ready for another adventure?</p>
+                @endif
             </div>
 
-            {{-- TODO: post to a login route that verifies the OTP once OTP login is built. --}}
-            <form class="login-form" action="{{ route('home') }}">
-                <div class="input-group">
-                    <label class="font-label-lg" for="username">Mobile Number</label>
+            @foreach (['success' => 'celebration', 'info' => 'info', 'error' => 'error'] as $type => $icon)
+                @if (session($type))
+                    <div class="site-flash login-flash">
+                        <div class="flash flash-{{ $type === 'error' ? 'error' : 'success' }}">
+                            <span class="material-symbols-outlined">{{ $icon }}</span> {{ session($type) }}
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+
+            <form class="login-form" method="POST" action="{{ $mode === 'join' ? route('join.attempt') : route('login.attempt') }}" novalidate>
+                @csrf
+
+                @if ($mode === 'join')
+                    <div class="input-group @error('name') has-error @enderror">
+                        <label class="font-label-lg" for="name">Rider Name</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <span class="material-symbols-outlined">person</span>
+                            </span>
+                            <input id="name" name="name" placeholder="Enter your name" required type="text"
+                                maxlength="100" value="{{ old('name') }}" class="font-body-lg" autocomplete="name" />
+                        </div>
+                        @error('name')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+                @endif
+
+                <div class="input-group @error('mobile') has-error @enderror">
+                    <label class="font-label-lg" for="mobile">Mobile Number</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
                             <span class="material-symbols-outlined">phone</span>
                         </span>
-                        <input id="username" name="username" placeholder="Enter your mobile number" required=""
-                            type="text" class="font-body-lg" />
+                        <input id="mobile" name="mobile" placeholder="Enter your mobile number" required type="tel"
+                            inputmode="numeric" maxlength="14" autocomplete="tel"
+                            value="{{ old('mobile', $prefillMobile ?? '') }}" class="font-body-lg" />
                     </div>
+                    @error('mobile')
+                        <span class="field-error">{{ $message }}
+                            @if ($mode === 'login' && str_contains($message, 'Join'))
+                                <a href="{{ route('join', ['mobile' => old('mobile')]) }}">Join now</a>
+                            @endif
+                        </span>
+                    @enderror
                 </div>
                 <div class="form-options">
-                    <a class="forgot-password font-label-lg" href="#">Send OTP</a>
+                    <a class="forgot-password font-label-lg" href="#" data-send-otp="{{ route('otp.send') }}"
+                        data-mobile-input="#mobile" data-status="#otp-status">Send OTP</a>
                 </div>
+                <p class="otp-status" id="otp-status" role="status">{{ session('otp_sent') }}</p>
 
-                <div class="input-group">
-                    <label class="font-label-lg" for="password">OTP</label>
+                <div class="input-group @error('otp') has-error @enderror">
+                    <label class="font-label-lg" for="otp">OTP</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
                             <span class="material-symbols-outlined">key</span>
                         </span>
-                        <input id="password" name="password" placeholder="Enter OTP" required="" type="password"
-                            class="font-body-lg" />
+                        <input id="otp" name="otp" placeholder="Enter OTP" required type="password" inputmode="numeric"
+                            maxlength="6" autocomplete="one-time-code" class="font-body-lg" />
                     </div>
+                    @error('otp')<span class="field-error">{{ $message }}</span>@enderror
                 </div>
 
-                <div class="form-options">
-                    <a class="forgot-password font-label-lg" href="{{ route('home') }}">Bypass</a>
-                </div>
+                @if (\App\Support\OtpService::testCode())
+                    <p class="otp-test-note">Testing mode: the OTP is always <strong>{{ \App\Support\OtpService::testCode() }}</strong></p>
+                @endif
 
                 <button class="login-btn font-headline-sm chunky-shadow-btn" type="submit">
-                    Let's Ride!
+                    {{ $mode === 'join' ? 'Create My Account' : "Let's Ride!" }}
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pedal_bike</span>
                 </button>
             </form>
 
             <div class="join-prompt">
                 <p class="font-label-lg">
-                    New rider? <a href="#">Join the Adventure</a>
+                    @if ($mode === 'join')
+                        Already a rider? <a href="{{ route('login') }}">Log in</a>
+                    @else
+                        New rider? <a href="{{ route('join') }}">Join the Adventure</a>
+                    @endif
                 </p>
             </div>
         </div>
     </main>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('frontend/js/otp.js') }}"></script>
+@endpush

@@ -7,6 +7,12 @@
         </div>
     </div>
     <div class="header-right">
+        @if ($currentRider)
+            <a href="{{ route('progress') }}" class="header-progress-btn font-label-lg {{ request()->routeIs('progress*') ? 'active' : '' }}">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="label">My Progress</span>
+            </a>
+        @endif
         <a href="{{ route('notifications') }}" class="icon-btn" aria-label="Notifications">
             <span class="material-symbols-outlined">notifications</span>
             @if ($currentRider && ($unread = $currentRider->notifications()->whereNull('read_at')->count()))
@@ -40,6 +46,10 @@
                     </a>
                 </div>
             </div>
+        @else
+            <a href="{{ route('login', ['redirect' => '/'.request()->path()]) }}" class="header-login-btn font-label-lg">
+                <span class="material-symbols-outlined">login</span> Log in
+            </a>
         @endif
     </div>
 </header>

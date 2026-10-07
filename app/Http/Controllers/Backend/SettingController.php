@@ -16,6 +16,7 @@ class SettingController extends Controller
         'community_goal_km' => 150,
         'community_progress_km' => 0,
         'support_email' => 'avon@avoncycles.com',
+        'auto_approve_rides' => 0,
     ];
 
     public function edit(): View
@@ -32,6 +33,7 @@ class SettingController extends Controller
             'community_goal_km' => ['required', 'numeric', 'gt:0'],
             'community_progress_km' => ['required', 'numeric', 'min:0'],
             'support_email' => ['required', 'email', 'max:120'],
+            'auto_approve_rides' => ['boolean'],
         ]);
 
         foreach ($data as $key => $value) {

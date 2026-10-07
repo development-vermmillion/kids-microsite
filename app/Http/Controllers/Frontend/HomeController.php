@@ -9,14 +9,16 @@ use App\Models\Ride;
 use App\Models\Rider;
 use App\Models\Setting;
 use App\Support\CurrentRider;
+use App\Support\ProgressService;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(CurrentRider $current): View
+    public function index(CurrentRider $current, ProgressService $service): View
     {
         $rider = $current->get();
         $riderBadges = $rider ? $rider->badges()->get()->keyBy('id') : collect();
+        $allBadges = Badge::orderBy('sort_order')->get();
 
         // Hall of Fame: top 5 riders by verified distance.
         $leaderboard = Rider::query()
@@ -28,21 +30,33 @@ class HomeController extends Controller
 
         $unlocked = $riderBadges->filter(fn ($b) => $b->pivot->unlocked_at);
 
-        $nextBadge = $riderBadges
-            ->reject(fn ($b) => $b->pivot->unlocked_at)
-            ->sortByDesc(fn ($b) => $b->pivot->progress_percent)
-            ->first();
+        // Next badge: the locked badge the rider is closest to (works for brand-new riders too).
+        $nextBadge = null;
+        if ($rider) {
+            $nextBadge = $allBadges
+                ->reject(fn ($b) => $riderBadges->get($b->id)?->pivot->unlocked_at)
+                ->filter(fn ($b) => $b->is_auto || $riderBadges->has($b->id))
+                ->map(function ($b) use ($rider, $riderBadges, $service) {
+                    $b->percent = $service->badgePercent($rider, $b, $riderBadges->get($b->id)?->pivot);
+
+                    return $b;
+                })
+                ->sortByDesc('percent')
+                ->first();
+        }
 
         $communityGoal = (float) Setting::get('community_goal_km', 150);
         $communityProgress = (float) Setting::get('community_progress_km', 0);
 
         return view('frontend.pages.home', [
             'leaderboard' => $leaderboard,
+            'rider' => $rider,
             'totalRides' => $rider ? $rider->rides()->where('status', Ride::STATUS_VERIFIED)->count() : 0,
+            'pendingRides' => $rider ? $rider->rides()->where('status', Ride::STATUS_PENDING)->count() : 0,
             'milestonesCount' => $unlocked->count(),
             'recentMilestones' => $unlocked->sortByDesc(fn ($b) => $b->pivot->unlocked_at)->take(3),
             'nextBadge' => $nextBadge,
-            'homeBadges' => Badge::where('show_on_home', true)->orderBy('sort_order')->get(),
+            'homeBadges' => $allBadges->where('show_on_home', true)->values(),
             'riderBadges' => $riderBadges,
             'communityMiles' => (int) Setting::get('community_miles_today', 0),
             'communityGoal' => $communityGoal,

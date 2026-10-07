@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // logged-in admins visiting the login page go to the dashboard.
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
         $middleware->redirectUsersTo(fn () => route('admin.dashboard'));
+
+        // Website pages that need a logged-in rider (mobile + OTP).
+        $middleware->alias(['rider' => \App\Http\Middleware\RequireRider::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

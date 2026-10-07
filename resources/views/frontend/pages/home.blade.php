@@ -10,10 +10,17 @@
         <img alt="Hero Banner" class="hero-banner-image" src="{{ asset('frontend/images/new-hero-bg.png') }}" />
 
         <div class="hero-actions">
-            <a href="{{ route('login') }}" class="hero-upload-btn font-headline-sm">
-                Login Now
-                <span class="material-symbols-outlined">login</span>
-            </a>
+            @if ($rider)
+                <a href="{{ route('progress') }}" class="hero-upload-btn font-headline-sm">
+                    My Progress
+                    <span class="material-symbols-outlined">trending_up</span>
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="hero-upload-btn font-headline-sm">
+                    Login Now
+                    <span class="material-symbols-outlined">login</span>
+                </a>
+            @endif
             <a href="{{ route('rides.create') }}" class="hero-upload-btn font-headline-sm hero-secondary-btn">
                 Upload Ride
                 <span class="material-symbols-outlined">upload_file</span>
@@ -76,40 +83,59 @@
                             Your Progress
                         </h4>
                         <div class="progress-card">
-                            @if ($nextBadge)
-                                <div class="next-badge">
-                                    <div class="header">
-                                        <p class="title font-headline-sm">Next Badge: {{ $nextBadge->name }}</p>
-                                        <span class="percentage font-headline-sm">{{ $nextBadge->pivot->progress_percent }}%</span>
-                                    </div>
-                                    <div class="bar-container">
-                                        <div class="bar-fill" style="width: {{ $nextBadge->pivot->progress_percent }}%;">
-                                            <span class="material-symbols-outlined icon">local_fire_department</span>
-                                            <div class="glass"></div>
+                            @if (! $rider)
+                                <div class="progress-guest">
+                                    <span class="material-symbols-outlined">pedal_bike</span>
+                                    <p class="font-headline-sm">Track your rides, earn badges and climb the Hall of Fame!</p>
+                                    <a href="{{ route('login') }}" class="see-progress-btn">
+                                        <span class="material-symbols-outlined">login</span> Log in to see your progress
+                                    </a>
+                                    <a href="{{ route('join') }}" class="progress-guest-join">New rider? Join the Adventure</a>
+                                </div>
+                            @else
+                                @if ($nextBadge)
+                                    <div class="next-badge">
+                                        <div class="header">
+                                            <p class="title font-headline-sm">Next Badge: {{ $nextBadge->name }}</p>
+                                            <span class="percentage font-headline-sm">{{ $nextBadge->percent }}%</span>
+                                        </div>
+                                        <div class="bar-container">
+                                            <div class="bar-fill" style="width: {{ max($nextBadge->percent, 12) }}%;">
+                                                <span class="material-symbols-outlined icon">local_fire_department</span>
+                                                <div class="glass"></div>
+                                            </div>
                                         </div>
                                     </div>
+                                @endif
+                                <div class="stats-grid">
+                                    <div class="stat-box primary">
+                                        <p class="label font-label-sm">Total Rides</p>
+                                        <p class="value font-headline-lg">{{ $totalRides }}</p>
+                                        @if ($pendingRides)
+                                            <p class="stat-box-note">+{{ $pendingRides }} waiting for review</p>
+                                        @endif
+                                    </div>
+                                    <div class="stat-box secondary">
+                                        <p class="label font-label-sm">Milestones</p>
+                                        <p class="value font-headline-lg">{{ $milestonesCount }}</p>
+                                    </div>
                                 </div>
+                                <div class="recent-milestones">
+                                    <p class="label font-label-sm">Recent Milestones</p>
+                                    <div class="milestone-icons">
+                                        @forelse ($recentMilestones as $milestone)
+                                            <div class="milestone-icon {{ $milestone->color }}" title="{{ $milestone->name }}">
+                                                <span class="material-symbols-outlined icon">{{ $milestone->icon }}</span>
+                                            </div>
+                                        @empty
+                                            <p class="milestone-empty">Your first badge is waiting. Keep riding!</p>
+                                        @endforelse
+                                    </div>
+                                </div>
+                                <a href="{{ route('progress') }}" class="see-progress-btn">
+                                    See My Progress <span class="material-symbols-outlined">arrow_forward</span>
+                                </a>
                             @endif
-                            <div class="stats-grid">
-                                <div class="stat-box primary">
-                                    <p class="label font-label-sm">Total Rides</p>
-                                    <p class="value font-headline-lg">{{ $totalRides }}</p>
-                                </div>
-                                <div class="stat-box secondary">
-                                    <p class="label font-label-sm">Milestones</p>
-                                    <p class="value font-headline-lg">{{ $milestonesCount }}</p>
-                                </div>
-                            </div>
-                            <div class="recent-milestones">
-                                <p class="label font-label-sm">Recent Milestones</p>
-                                <div class="milestone-icons">
-                                    @foreach ($recentMilestones as $milestone)
-                                        <div class="milestone-icon {{ $milestone->color }}" title="{{ $milestone->name }}">
-                                            <span class="material-symbols-outlined icon">{{ $milestone->icon }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

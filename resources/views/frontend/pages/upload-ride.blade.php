@@ -23,39 +23,62 @@
             <form class="upload-form" method="POST" action="{{ route('rides.store') }}" enctype="multipart/form-data" novalidate>
                 @csrf
                 <div class="form-grid">
-                    <div class="input-group {{ $err('mobile') }}">
-                        <label class="font-label-lg" for="mobile">Mobile Number</label>
-                        <div class="input-wrapper">
-                            <span class="input-icon material-symbols-outlined">smartphone</span>
-                            <input id="mobile" name="mobile" type="tel" placeholder="Enter mobile number" required
-                                inputmode="numeric" maxlength="14" value="{{ old('mobile', $currentRider?->mobile) }}"
-                                class="font-body-lg" />
-                        </div>
-                        @error('mobile')<span class="field-error">{{ $message }}</span>@enderror
-                    </div>
-
-                    {{-- OTP verification is not built yet; the field is shown but not checked. --}}
-                    <div class="input-group otp-group">
-                        <label class="font-label-lg" for="otp">OTP Verification</label>
-                        <div class="otp-wrapper">
-                            <div class="input-wrapper">
-                                <span class="input-icon material-symbols-outlined">password</span>
-                                <input id="otp" name="otp" type="text" placeholder="Enter OTP" inputmode="numeric"
-                                    class="font-body-lg" />
+                    @if ($currentRider)
+                        {{-- Logged in: no OTP needed. --}}
+                        <div class="input-group full-width">
+                            <div class="uploading-as">
+                                <img src="{{ $currentRider->avatar_or_placeholder }}" alt="" />
+                                <div>
+                                    <small>Uploading as</small>
+                                    <strong>{{ $currentRider->name }}</strong>
+                                    <span>{{ $currentRider->mobile }}</span>
+                                </div>
+                                <a href="{{ route('logout') }}">Not you?</a>
                             </div>
-                            <button type="button" class="btn-send-otp font-label-lg chunky-shadow-small">Send OTP</button>
                         </div>
-                    </div>
+                    @else
+                        <div class="input-group {{ $err('mobile') }}">
+                            <label class="font-label-lg" for="mobile">Mobile Number</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon material-symbols-outlined">smartphone</span>
+                                <input id="mobile" name="mobile" type="tel" placeholder="Enter mobile number" required
+                                    inputmode="numeric" maxlength="14" value="{{ old('mobile') }}" class="font-body-lg" />
+                            </div>
+                            @error('mobile')<span class="field-error">{{ $message }}</span>@enderror
+                        </div>
 
-                    <div class="input-group full-width {{ $err('name') }}">
-                        <label class="font-label-lg" for="name">Rider Name</label>
-                        <div class="input-wrapper">
-                            <span class="input-icon material-symbols-outlined">person</span>
-                            <input id="name" name="name" type="text" placeholder="Enter rider name" required
-                                value="{{ old('name', $currentRider?->name) }}" class="font-body-lg" />
+                        <div class="input-group otp-group {{ $err('otp') }}">
+                            <label class="font-label-lg" for="otp">OTP Verification</label>
+                            <div class="otp-wrapper">
+                                <div class="input-wrapper">
+                                    <span class="input-icon material-symbols-outlined">password</span>
+                                    <input id="otp" name="otp" type="text" placeholder="Enter OTP" inputmode="numeric"
+                                        maxlength="6" autocomplete="one-time-code" class="font-body-lg" />
+                                </div>
+                                <button type="button" class="btn-send-otp font-label-lg chunky-shadow-small"
+                                    data-send-otp="{{ route('otp.send') }}" data-mobile-input="#mobile"
+                                    data-status="#otp-status">Send OTP</button>
+                            </div>
+                            <span class="otp-status" id="otp-status" role="status"></span>
+                            @error('otp')<span class="field-error">{{ $message }}</span>@enderror
                         </div>
-                        @error('name')<span class="field-error">{{ $message }}</span>@enderror
-                    </div>
+
+                        <div class="input-group full-width {{ $err('name') }}">
+                            <label class="font-label-lg" for="name">Rider Name</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon material-symbols-outlined">person</span>
+                                <input id="name" name="name" type="text" placeholder="Enter rider name" required
+                                    value="{{ old('name') }}" class="font-body-lg" />
+                            </div>
+                            @error('name')<span class="field-error">{{ $message }}</span>@enderror
+                            <p class="form-note">
+                                Already a rider? <a href="{{ route('login') }}">Log in</a> to skip this step.
+                                @if (\App\Support\OtpService::testCode())
+                                    <br>Testing mode: the OTP is always <strong>{{ \App\Support\OtpService::testCode() }}</strong>.
+                                @endif
+                            </p>
+                        </div>
+                    @endif
 
                     <div class="input-group {{ $err('ride_date') }}">
                         <label class="font-label-lg" for="date">Ride Date</label>
@@ -122,6 +145,7 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('frontend/js/otp.js') }}"></script>
     <script>
         // Show the chosen picture inside the upload box.
         document.getElementById('proof').addEventListener('change', (e) => {

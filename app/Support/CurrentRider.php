@@ -3,13 +3,11 @@
 namespace App\Support;
 
 use App\Models\Rider;
+use Illuminate\Support\Facades\Session;
 
 /**
- * Resolves the rider the frontend is shown for.
- *
- * Mobile + OTP login is not built yet, so this falls back to the demo rider
- * (config/kidsavon.php). Once login exists, store the rider id in the session
- * under "rider_id" and every page picks it up automatically.
+ * The rider who is logged in on the website (mobile number + OTP).
+ * Guests get null.
  */
 class CurrentRider
 {
@@ -22,13 +20,42 @@ class CurrentRider
         if (! $this->resolved) {
             $this->resolved = true;
 
-            $id = session('rider_id');
+            $id = Session::get('rider_id');
+            $rider = $id ? Rider::find($id) : null;
 
-            $this->rider = $id
-                ? Rider::find($id)
-                : Rider::where('mobile', config('kidsavon.demo_rider_mobile'))->first();
+            // A rider paused by the admin is logged out.
+            if ($rider && ! $rider->is_active) {
+                Session::forget('rider_id');
+                $rider = null;
+            }
+
+            $this->rider = $rider;
         }
 
         return $this->rider;
+    }
+
+    public function check(): bool
+    {
+        return $this->get() !== null;
+    }
+
+    public function login(Rider $rider): void
+    {
+        Session::regenerate();
+        Session::put('rider_id', $rider->id);
+        $rider->forceFill(['last_login_at' => now()])->save();
+
+        $this->rider = $rider;
+        $this->resolved = true;
+    }
+
+    public function logout(): void
+    {
+        Session::forget('rider_id');
+        Session::regenerateToken();
+
+        $this->rider = null;
+        $this->resolved = true;
     }
 }

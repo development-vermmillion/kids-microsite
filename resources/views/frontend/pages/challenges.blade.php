@@ -48,9 +48,19 @@
                                     {{ Format::number($challenge->progress) }} / {{ Format::number($challenge->target_value) }}{{ $challenge->unit ? ' '.$challenge->unit : '' }}
                                 </span>
                             </div>
-                            <div class="progress-bar-bg">
+                            <div class="progress-bar-bg progress-split">
                                 <div class="progress-bar-fill fill-{{ $challenge->color }}" style="width: {{ $challenge->percent }}%;"></div>
+                                @if ($challenge->pending_percent)
+                                    <div class="progress-pending pending-{{ $challenge->color }}" style="width: {{ $challenge->pending_percent }}%;"
+                                        title="Waiting for review"></div>
+                                @endif
                             </div>
+                            @if ($challenge->pending > 0)
+                                <p class="pending-note">
+                                    <span class="material-symbols-outlined">hourglass_top</span>
+                                    +{{ Format::number($challenge->pending) }}{{ $challenge->unit ? ' '.$challenge->unit : '' }} waiting for review
+                                </p>
+                            @endif
                         </div>
 
                         @if ($challenge->is_completed)
@@ -60,6 +70,10 @@
                         @elseif ($challenge->is_joined)
                             <a href="{{ route('rides.create') }}" class="btn btn-{{ $challenge->color }} chunky-shadow font-label-lg">
                                 Log Progress
+                            </a>
+                        @elseif (! $currentRider)
+                            <a href="{{ route('login', ['redirect' => '/challenges']) }}" class="btn btn-{{ $challenge->color }} chunky-shadow font-label-lg">
+                                Log in to Join
                             </a>
                         @else
                             <form method="POST" action="{{ route('challenges.join', $challenge) }}">

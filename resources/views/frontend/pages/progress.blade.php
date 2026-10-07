@@ -23,6 +23,9 @@
                 <div class="stat-info">
                     <p class="stat-label font-label-sm text-variant">Total Distance</p>
                     <p class="stat-value font-headline-md">{{ Format::km($totalDistance) }} <span class="unit font-body-md">km</span></p>
+                    @if ($pendingDistance > 0)
+                        <p class="stat-pending">+{{ Format::km($pendingDistance) }} km waiting for review</p>
+                    @endif
                 </div>
             </div>
 
@@ -33,6 +36,9 @@
                 <div class="stat-info">
                     <p class="stat-label font-label-sm text-variant">Total Rides</p>
                     <p class="stat-value font-headline-md">{{ $totalRides }}</p>
+                    @if ($pendingRides > 0)
+                        <p class="stat-pending">+{{ $pendingRides }} waiting for review</p>
+                    @endif
                 </div>
             </div>
 
@@ -55,6 +61,55 @@
                     <p class="stat-value font-headline-md">{{ $hoursInSaddle }} <span class="unit font-body-md">hrs</span></p>
                 </div>
             </div>
+        </div>
+
+        <!-- My Challenges -->
+        <div class="recent-rides-section soft-shadow my-challenges">
+            <div class="section-top">
+                <h3 class="font-headline-md">My Challenges</h3>
+                <a href="{{ route('challenges.index') }}" class="add-ride-btn font-label-lg">
+                    <span class="material-symbols-outlined">flag</span> All Challenges
+                </a>
+            </div>
+
+            @forelse ($challenges as $challenge)
+                <div class="my-challenge">
+                    <div class="my-challenge-icon bg-{{ $challenge->color }}-soft">
+                        <span class="material-symbols-outlined">{{ $challenge->icon }}</span>
+                    </div>
+                    <div class="my-challenge-body">
+                        <div class="my-challenge-top">
+                            <h4 class="font-headline-sm">{{ $challenge->title }}</h4>
+                            @if ($challenge->is_completed)
+                                <span class="ride-status status-verified font-label-sm">
+                                    <span class="material-symbols-outlined">check_circle</span> Completed
+                                </span>
+                            @else
+                                <span class="my-challenge-count">
+                                    {{ Format::number($challenge->progress) }} / {{ Format::number($challenge->target_value) }}{{ $challenge->unit ? ' '.$challenge->unit : '' }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="progress-split my-challenge-bar">
+                            <div class="progress-bar-fill fill-{{ $challenge->color }}" style="width: {{ $challenge->percent }}%;"></div>
+                            @if ($challenge->pending_percent)
+                                <div class="progress-pending pending-{{ $challenge->color }}" style="width: {{ $challenge->pending_percent }}%;"></div>
+                            @endif
+                        </div>
+                        @if ($challenge->pending > 0)
+                            <p class="pending-note">
+                                <span class="material-symbols-outlined">hourglass_top</span>
+                                +{{ Format::number($challenge->pending) }}{{ $challenge->unit ? ' '.$challenge->unit : '' }} waiting for review
+                            </p>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <p class="font-body-md text-variant my-challenge-empty">
+                    You haven't joined a challenge yet.
+                    <a href="{{ route('challenges.index') }}">Pick one to start!</a>
+                </p>
+            @endforelse
         </div>
 
         <!-- Recent Rides List -->
@@ -84,7 +139,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="font-body-md text-variant">No rides yet. Upload your first ride to get started!</p>
+                    <p class="font-body-md text-variant">No rides yet. <a href="{{ route('rides.create') }}">Upload your first ride</a> to get started!</p>
                 @endforelse
             </div>
             @if ($totalUploaded > $recentRides->count())

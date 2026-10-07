@@ -4,11 +4,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | OTP login
+    |--------------------------------------------------------------------------
+    |
+    | While test_code is set, every OTP is this code and no SMS is sent.
+    | Before launch, set OTP_TEST_CODE= (empty) in .env and connect an SMS
+    | provider in app/Support/OtpService.php.
+    |
+    */
+
+    'otp' => [
+        'test_code' => env('OTP_TEST_CODE', '1234'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Demo rider
     |--------------------------------------------------------------------------
     |
-    | Until mobile + OTP login is built, pages are shown for this rider.
-    | It is created by the KidsAvonDemoSeeder ("Alex Rider").
+    | Mobile number of the demo rider ("Alex Rider") created by the
+    | KidsAvonDemoSeeder. Log in with it and the test OTP to try the site.
     |
     */
 
