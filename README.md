@@ -9,7 +9,7 @@ database.
 Requires PHP 8.3+ and Composer.
 
 ```bash
-cd Avon-kids-microsite
+cd kids-microsite
 composer install
 cp .env.example .env
 php artisan key:generate

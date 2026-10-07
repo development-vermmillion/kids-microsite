@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>Kids Avon - Dashboard</title>
+        <!-- Link to our new custom CSS file -->
+        <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+        <!-- Main Content Area -->
+        <main class="app-container">
+
+                <!-- TopAppBar -->
+                <header class="top-header">
+                        <div class="header-left">
+                                <div class="brand">
+                                        <div class="brand-logo font-headline-sm">K</div>
+                                        <h1 class="brand-name font-headline-sm">Kids Avon</h1>
+                                </div>
+                                <!--div class="search-bar">
+                                        <span class="material-symbols-outlined search-icon">search</span>
+                                        <input class="font-body-md" placeholder="Search friends, trails..."
+                                                type="text" />
+                                </div-->
+                        </div>
+                        <div class="header-right">
+                                <a href="notifications.html" class="icon-btn">
+                                        <span class="material-symbols-outlined">notifications</span>
+                                </a>
+                                <a href="my-trophies.html" class="icon-btn">
+                                        <span class="material-symbols-outlined">emoji_events</span>
+                                </a>
+                                <div class="user-profile" onclick="this.classList.toggle('menu-active')">
+                                        <img alt="User Avatar"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuh7NkhUtOMFc6JuaD-jHCZTiP32zOtiFu92g3O7RbaDVr0qCpDefyljNFPRyl9Zmb86qrfOIrN_ao-6dhdhijoE2kU9aCEHg4UcmSZ0O2frhN5CQid38YwVPnGkOHxN488v4SKJPTOdjSwbQwnxMuomSUFiuEFRt3ITGTlLHvRE_K4IDttp9clDtwRJtJ_ey-VPdkoE2KWr5XOLmQQza9Koadbffoj_rHmRSheU6o5xf2zRQvQDS5" />
+                                        <div class="user-info">
+                                                <p class="user-name font-label-lg">Alex Rider</p>
+                                                <p class="user-level font-label-sm">Level 12 Cyclist</p>
+                                        </div>
+                                        <span class="material-symbols-outlined hamburger-icon">menu</span>
+                                        <div class="profile-dropdown soft-shadow">
+                                                <a href="progress.html" class="dropdown-item font-body-md"><span
+                                                                class="material-symbols-outlined">trending_up</span> My
+                                                        Progress</a>
+                                                <a href="active-challenges.html"
+                                                        class="dropdown-item font-body-md"><span
+                                                                class="material-symbols-outlined">flag</span>
+                                                        Challenges</a>
+
+                                                <a href="#" class="dropdown-item font-body-md"><span
+                                                                class="material-symbols-outlined">settings</span>
+                                                        Settings</a>
+                                                <div class="dropdown-divider"></div>
+                                                <a href="login.html" class="dropdown-item logout font-body-md"><span
+                                                                class="material-symbols-outlined">logout</span> Log
+                                                        Out</a>
+                                        </div>
+                                </div>
+                        </div>
+                </header>
+
+                <!-- Hero Banner Section -->
+                <section class="hero-banner-section soft-shadow">
+                        <img alt="Hero Banner" class="hero-banner-image" src="images/new-hero-bg.png" />
+
+                        <div class="hero-actions">
+                                <a href="login.html" class="hero-upload-btn font-headline-sm">
+                                        Login Now
+                                        <span class="material-symbols-outlined">login</span>
+                                </a>
+                                <a href="upload-ride.html" class="hero-upload-btn font-headline-sm hero-secondary-btn">
+                                        Upload Ride
+                                        <span class="material-symbols-outlined">upload_file</span>
+                                </a>
+                        </div>
+                </section>
+
+                <!-- Dashboard Content -->
+                <div class="dashboard-content">
+                        <div class="dashboard-grid">
+
+                                <!-- Leaderboard & Progress Section -->
+                                <section class="leaderboard-section">
+                                        <h3 class="section-title font-headline-md">Leaderboard / <span
+                                                        class="red-heading">Progress</span></h3>
+                                        <div class="leaderboard-grid">
+                                                <!-- Hall of Fame -->
+                                                <div class="hall-of-fame">
+                                                        <h4 class="sub-title font-headline-sm">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">emoji_events</span>
+                                                                Hall of Fame
+                                                        </h4>
+                                                        <div class="leaderboard-card">
+                                                                <div class="top-player">
+                                                                        <div class="player-info">
+                                                                                <span
+                                                                                        class="rank font-headline-sm">1</span>
+                                                                                <img alt="Champion"
+                                                                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuh7NkhUtOMFc6JuaD-jHCZTiP32zOtiFu92g3O7RbaDVr0qCpDefyljNFPRyl9Zmb86qrfOIrN_ao-6dhdhijoE2kU9aCEHg4UcmSZ0O2frhN5CQid38YwVPnGkOHxN488v4SKJPTOdjSwbQwnxMuomSUFiuEFRt3ITGTlLHvRE_K4IDttp9clDtwRJtJ_ey-VPdkoE2KWr5XOLmQQza9Koadbffoj_rHmRSheU6o5xf2zRQvQDS5" />
+                                                                                <div class="details">
+                                                                                        <p
+                                                                                                class="name font-headline-sm">
+                                                                                                Sarah Wheeler</p>
+                                                                                        <p class="badge font-label-sm">
+                                                                                                <span
+                                                                                                        class="material-symbols-outlined icon">military_tech</span>
+                                                                                                Champion
+                                                                                        </p>
+                                                                                </div>
+                                                                        </div>
+                                                                        <span class="score font-headline-sm">45
+                                                                                Km</span>
+                                                                </div>
+                                                                <div class="other-players">
+                                                                        <div class="player-row">
+                                                                                <div class="player-info">
+                                                                                        <span
+                                                                                                class="rank font-headline-sm">2</span>
+                                                                                        <div
+                                                                                                class="avatar-placeholder bg-secondary font-label-lg">
+                                                                                                JD</div>
+                                                                                        <p class="name font-label-lg">
+                                                                                                Jake Doe</p>
+                                                                                </div>
+                                                                                <span class="score font-label-lg">42
+                                                                                        Km</span>
+                                                                        </div>
+                                                                        <div class="player-row">
+                                                                                <div class="player-info">
+                                                                                        <span
+                                                                                                class="rank font-headline-sm">3</span>
+                                                                                        <div
+                                                                                                class="avatar-placeholder bg-tertiary font-label-lg">
+                                                                                                ML</div>
+                                                                                        <p class="name font-label-lg">
+                                                                                                Mia Luna</p>
+                                                                                </div>
+                                                                                <span class="score font-label-lg">40
+                                                                                        Km</span>
+                                                                        </div>
+                                                                        <div class="player-row">
+                                                                                <div class="player-info">
+                                                                                        <span
+                                                                                                class="rank font-headline-sm">4</span>
+                                                                                        <div
+                                                                                                class="avatar-placeholder bg-gray font-label-lg">
+                                                                                                RK</div>
+                                                                                        <p class="name font-label-lg">
+                                                                                                Ryan King</p>
+                                                                                </div>
+                                                                                <span class="score font-label-lg">35
+                                                                                        Km</span>
+                                                                        </div>
+                                                                        <div class="player-row">
+                                                                                <div class="player-info">
+                                                                                        <span
+                                                                                                class="rank font-headline-sm">5</span>
+                                                                                        <div
+                                                                                                class="avatar-placeholder bg-gray font-label-lg">
+                                                                                                EP</div>
+                                                                                        <p class="name font-label-lg">
+                                                                                                Emma P.</p>
+                                                                                </div>
+                                                                                <span class="score font-label-lg">31
+                                                                                        Km</span>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                </div>
+
+                                                <!-- Your Progress -->
+                                                <div class="your-progress">
+                                                        <h4 class="sub-title font-headline-sm">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">trending_up</span>
+                                                                Your Progress
+                                                        </h4>
+                                                        <div class="progress-card">
+                                                                <div class="next-badge">
+                                                                        <div class="header">
+                                                                                <p class="title font-headline-sm">Next
+                                                                                        Badge: Trail Blazer</p>
+                                                                                <span
+                                                                                        class="percentage font-headline-sm">85%</span>
+                                                                        </div>
+                                                                        <div class="bar-container">
+                                                                                <div class="bar-fill">
+                                                                                        <span
+                                                                                                class="material-symbols-outlined icon">local_fire_department</span>
+                                                                                        <div class="glass"></div>
+                                                                                </div>
+                                                                        </div>
+                                                                </div>
+                                                                <div class="stats-grid">
+                                                                        <div class="stat-box primary">
+                                                                                <p class="label font-label-sm">Total
+                                                                                        Rides</p>
+                                                                                <p class="value font-headline-lg">42</p>
+                                                                        </div>
+                                                                        <div class="stat-box secondary">
+                                                                                <p class="label font-label-sm">
+                                                                                        Milestones</p>
+                                                                                <p class="value font-headline-lg">12</p>
+                                                                        </div>
+                                                                </div>
+                                                                <div class="recent-milestones">
+                                                                        <p class="label font-label-sm">Recent Milestones
+                                                                        </p>
+                                                                        <div class="milestone-icons">
+                                                                                <div class="milestone-icon secondary"
+                                                                                        title="5 Mile Club">
+                                                                                        <span
+                                                                                                class="material-symbols-outlined icon">distance</span>
+                                                                                </div>
+                                                                                <div class="milestone-icon tertiary"
+                                                                                        title="Early Bird">
+                                                                                        <span
+                                                                                                class="material-symbols-outlined icon">wb_sunny</span>
+                                                                                </div>
+                                                                                <div class="milestone-icon primary"
+                                                                                        title="Speed Demon">
+                                                                                        <span
+                                                                                                class="material-symbols-outlined icon">bolt</span>
+                                                                                </div>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </section>
+
+
+                                <!-- Hero Section -->
+                                <section class="hero-section girl-background-banner">
+                                        <div class="girl-background-box">
+                                                <div class="hero-content ">
+                                                        <h2 class="font-headline-lg">Ready for next <span
+                                                                        class="highlight">Adventure?</span></h2>
+                                                        <p class="font-body-lg">The Weekend Warrior challenge just
+                                                                started! Ride
+                                                                5 miles this weekend to unlock an exclusive badge.</p>
+                                                        <button class="cta-btn chunky-shadow font-headline-sm"
+                                                                onclick="window.location.href='active-challenges.html'">
+                                                                View Challenge <span
+                                                                        class="material-symbols-outlined">rocket_launch</span>
+                                                        </button>
+                                                </div>
+                                        </div>
+
+                                </section>
+
+
+
+                                <!-- Stats Section -->
+                                <div class="stats-section">
+                                        <!-- Community Miles -->
+                                        <div class="community-miles chunky-shadow-primary">
+                                                <span class="material-symbols-outlined icon">public</span>
+                                                <h3 class="font-label-lg">Community Miles</h3>
+                                                <div class="counter-value font-headline-lg">
+                                                        <span id="counter">12,450</span>
+                                                </div>
+                                                <p class="font-label-sm">Miles ridden by Kids Avon today!</p>
+                                        </div>
+
+                                        <!-- Global Challenge Progress -->
+                                        <div class="global-challenge soft-shadow">
+                                                <div class="challenge-header">
+                                                        <div class="title-area">
+                                                                <h3 class="font-headline-sm"><span
+                                                                                class="material-symbols-outlined icon">explore</span>
+                                                                        Next Badge</h3>
+                                                        </div>
+                                                        <span class="percentage font-headline-sm">75%</span>
+                                                </div>
+                                                <div class="progress-bar-container">
+                                                        <div class="progress-fill">
+                                                                <span class="material-symbols-outlined icon">star</span>
+                                                                <div class="glass-overlay"></div>
+                                                        </div>
+                                                </div>
+                                                <div class="challenge-labels font-body-md font-label-sm">
+                                                        <span>0m</span>
+                                                        <span class="goal">150 Km Goal</span>
+                                                </div>
+                                        </div>
+                                </div>
+
+
+
+                                <!-- Badges Section -->
+                                <section class="badges-section soft-shadow">
+                                        <div class="decorative-bg">
+                                                <span class="material-symbols-outlined icon-star-1">stars</span>
+                                                <span class="material-symbols-outlined icon-star-2">auto_awesome</span>
+                                                <span
+                                                        class="material-symbols-outlined icon-star-3">workspace_premium</span>
+                                        </div>
+
+                                        <div class="badges-header">
+                                                <div class="title-area">
+                                                        <div class="indicator"></div>
+                                                        <h3 class="font-headline-md">New Badges <span
+                                                                        class="red-heading">to Earn</span></h3>
+                                                </div>
+                                                <a class="view-all-btn font-label-lg chunky-shadow-primary"
+                                                        href="active-challenges.html">
+                                                        View All <span
+                                                                class="material-symbols-outlined icon">arrow_forward</span>
+                                                </a>
+                                        </div>
+
+                                        <div class="badges-grid">
+                                                <!-- Unlocked Badge -->
+                                                <div class="badge-card unlocked">
+                                                        <div class="hover-bg"></div>
+                                                        <div class="image-container">
+                                                                <div class="glow"></div>
+                                                                <img alt="Speed Star" src="images/trophy2.jpg" />
+                                                        </div>
+                                                        <h4 class="font-headline-sm">Speed Star</h4>
+                                                        <p class="font-body-md">Hit 10mph</p>
+                                                        <div class="status-badge font-label-sm">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">lock_open</span>
+                                                                Unlocked
+                                                        </div>
+                                                </div>
+
+                                                <!-- Locked Badge -->
+                                                <div class="badge-card locked hover-tertiary">
+                                                        <div class="image-container pos-right">
+                                                                <img alt="Power Pedal"
+                                                                        src="https://lh3.googleusercontent.com/aida/AP1WRLtgqOOcW1Bga3aI3iDqkULOk866sMb_zfq_h-A3GCEPg3QzVACL8d73uNUg_-3gWSXxg2AX9E36nFw9BK-BGGrER3nnY5WEJcJxp3--zpnRTMz17mEGBflKbKNbYZlAu2rgU23SOWrQQABle2u8ug22bsnUdxM6aXPZvo92m1rEoNoVgVN2jzYxVQ5zPWS-Sj_xixX20M9TVzyMycNCau7MgDvFMV6EET71q3bnqzaSSeWXqqBEpxf_Tg" />
+                                                                <div class="lock-overlay">
+                                                                        <div class="lock-icon-container">
+                                                                                <span
+                                                                                        class="material-symbols-outlined icon">lock</span>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                        <h4 class="font-headline-sm">Power Pedal</h4>
+                                                        <p class="font-body-md">Ride 5 days</p>
+                                                        <div class="status-badge font-label-sm">Locked</div>
+                                                </div>
+
+                                                <!-- Locked Badge -->
+                                                <div class="badge-card locked hover-primary">
+                                                        <div class="image-container pos-center">
+                                                                <img alt="Champion"
+                                                                        src="https://lh3.googleusercontent.com/aida/AP1WRLtgqOOcW1Bga3aI3iDqkULOk866sMb_zfq_h-A3GCEPg3QzVACL8d73uNUg_-3gWSXxg2AX9E36nFw9BK-BGGrER3nnY5WEJcJxp3--zpnRTMz17mEGBflKbKNbYZlAu2rgU23SOWrQQABle2u8ug22bsnUdxM6aXPZvo92m1rEoNoVgVN2jzYxVQ5zPWS-Sj_xixX20M9TVzyMycNCau7MgDvFMV6EET71q3bnqzaSSeWXqqBEpxf_Tg" />
+                                                                <div class="lock-overlay">
+                                                                        <div class="lock-icon-container">
+                                                                                <span
+                                                                                        class="material-symbols-outlined icon">lock</span>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                        <h4 class="font-headline-sm">Champion</h4>
+                                                        <p class="font-body-md">Top 10 locally</p>
+                                                        <div class="status-badge font-label-sm">Locked</div>
+                                                </div>
+
+                                                <!-- Mystery Badge -->
+                                                <div class="badge-card mystery">
+                                                        <div class="pulse-bg"></div>
+                                                        <div class="mystery-icon-container">
+                                                                <span class="material-symbols-outlined icon">help</span>
+                                                        </div>
+                                                        <h4 class="font-headline-sm">Mystery Badge</h4>
+                                                        <p class="font-body-md font-label-sm">Keep riding to reveal!</p>
+                                                </div>
+                                        </div>
+                                </section>
+
+                                <!-- How it Works Section -->
+                                <section class="how-it-works-section soft-shadow">
+                                        <img alt="How it works" class="how-it-works-image"
+                                                src="images/how-it-works.jpeg" />
+                                </section>
+
+                                <!-- Verification Section -->
+                                <section class="verification-section ">
+                                        <div class="decorative-blob blob-1"></div>
+                                        <div class="decorative-blob blob-2"></div>
+
+                                        <div class="verification-content">
+
+
+                                                <div class="example-area">
+
+
+                                                        <div class="info-area">
+                                                                <div class="header">
+                                                                        <div class="icon-container">
+                                                                                <span
+                                                                                        class="material-symbols-outlined icon">verified</span>
+                                                                        </div>
+                                                                        <h3 class="font-headline-md section-title-left">
+                                                                                Ride
+                                                                                <span
+                                                                                        class="highlight">Verification</span>
+                                                                        </h3>
+                                                                </div>
+                                                                <p class="font-body-lg description">
+                                                                        Ready to claim your badges? Upload your ride
+                                                                        screenshot
+                                                                        from Strava.
+                                                                        Make sure your <strong>activity date</strong>
+                                                                        and
+                                                                        <strong>distance</strong>
+                                                                        (at least 1 mile!) are clearly visible.
+                                                                </p>
+
+                                                                <div class="upload-action">
+                                                                        <a href="upload-ride.html"
+                                                                                class="upload-btn font-headline-sm chunky-shadow">
+                                                                                Upload Ride
+                                                                                <span
+                                                                                        class="material-symbols-outlined">upload_file</span>
+                                                                        </a>
+                                                                        <span class="hint font-label-sm">Supports JPG,
+                                                                                PNG</span>
+                                                                </div>
+                                                        </div>
+
+                                                </div>
+                                        </div>
+                                </section>
+
+                                <!-- Safety Info Section -->
+                                <section class="safety-section soft-shadow">
+                                        <img alt="Safety Banner" class="safety-banner-image"
+                                                src="images/ride-safe-banner.png" />
+                                </section>
+
+                                <!-- FAQ Section -->
+                                <section class="faq-section soft-shadow">
+                                        <h3 class="section-title font-headline-md">FAQ / Suggested <span
+                                                        class="red-heading">Questions</span></h3>
+                                        <div class="faq-grid">
+                                                <div class="faq-item">
+                                                        <h4 class="font-headline-sm color-secondary">
+                                                                <span class="material-symbols-outlined icon">help</span>
+                                                                How do I participate?
+                                                        </h4>
+                                                        <p class="font-body-md">Just grab your bike, helmet, and start
+                                                                riding! Track your miles using Strava and upload them
+                                                                here.</p>
+                                                </div>
+
+                                                <div class="faq-item">
+                                                        <h4 class="font-headline-sm color-tertiary">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">account_circle</span>
+                                                                Do I need a Strava account?
+                                                        </h4>
+                                                        <p class="font-body-md">Yes, we use Strava to verify your rides.
+                                                                Ask a parent to help you set one up!</p>
+                                                </div>
+
+                                                <div class="faq-item">
+                                                        <h4 class="font-headline-sm color-primary">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">directions_bike</span>
+                                                                What activities are eligible?
+                                                        </h4>
+                                                        <p class="font-body-md">Any bicycle ride counts! Just make sure
+                                                                you're riding safely on designated paths.</p>
+                                                </div>
+
+                                                <div class="faq-item">
+                                                        <h4 class="font-headline-sm color-secondary">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">screenshot</span>
+                                                                What should my screenshot show?
+                                                        </h4>
+                                                        <p class="font-body-md">Your screenshot must clearly show the
+                                                                activity date and distance (at least 1 mile!).</p>
+                                                </div>
+
+                                                <div class="faq-item">
+                                                        <h4 class="font-headline-sm color-tertiary">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">military_tech</span>
+                                                                When will I receive my reward?
+                                                        </h4>
+                                                        <p class="font-body-md">Badges are unlocked immediately after
+                                                                verification. Keep riding to level up!</p>
+                                                </div>
+
+
+
+                                                <div class="faq-item">
+                                                        <h4 class="font-headline-sm color-neutral">
+                                                                <span
+                                                                        class="material-symbols-outlined icon">error</span>
+                                                                What happens if my submission is rejected?
+                                                        </h4>
+                                                        <p class="font-body-md">We'll let you know why.
+                                                                Usually, it's just a missing date or distance.</p>
+                                                </div>
+                                        </div>
+                                </section>
+                        </div>
+                </div>
+        </main>
+
+        <footer class="site-footer font-headline-sm">
+                <div class="footer-container">
+                        <div class="footer-grid">
+                                <div class="footer-col">
+                                        <div class="brand">
+                                                <div class="logo font-headline-sm">K</div>
+                                                <h2>Kids Avon</h2>
+                                        </div>
+                                        <p class="desc font-body-md">Empowering young cyclists to explore, achieve, and
+                                                stay active together.</p>
+                                        <div class="support">
+                                                <span class="label font-label-sm">Help &amp; Support</span>
+                                                <a class="font-body-md" href="mailto:avon@avoncycles.com">
+                                                        <span class="material-symbols-outlined icon">mail</span>
+                                                        avon@avoncycles.com
+                                                </a>
+                                        </div>
+                                </div>
+
+                                <div class="footer-col">
+                                        <h3>
+                                                <span
+                                                        class="material-symbols-outlined icon-secondary">health_and_safety</span>
+                                                Safety First
+                                        </h3>
+                                        <ul class="font-body-md">
+                                                <li>• Wear a properly fitted helmet</li>
+                                                <li>• Stay on designated bike paths</li>
+                                                <li>• Use hand signals when turning</li>
+                                                <li>• Ride with a buddy or adult</li>
+                                        </ul>
+                                </div>
+
+                                <div class="footer-col">
+                                        <h3>
+                                                <span
+                                                        class="material-symbols-outlined icon-tertiary">family_restroom</span>
+                                                For Parents
+                                        </h3>
+                                        <p class="text-block font-body-md">Guardian consent is required. We prioritize
+                                                safety with moderated features and private tracking.</p>
+                                        <p class="text-block font-body-md"><span class="highlight">Activity:</span> Stay
+                                                hydrated and check tire pressure before every ride!</p>
+                                </div>
+
+                                <div class="footer-col">
+                                        <h3>
+                                                <span class="material-symbols-outlined icon-neutral">quiz</span> Quick
+                                                Links
+                                        </h3>
+                                        <nav class="font-body-md">
+                                                <a href="#">Avon Cycles</a>
+                                                <a href="#">Avon Fitness</a>
+                                                <a href="#">Avon E-bike</a>
+                                        </nav>
+                                </div>
+                        </div>
+
+                        <div class="footer-bottom">
+                                <p class="copyright font-label-sm">© 2024 Kids Avon. All rights reserved.</p>
+                                <div class="legal-links font-label-sm">
+                                        <a href="#">Terms of Service</a>
+                                        <a href="#">Privacy Policy</a>
+                                        <a href="#">Cookie Settings</a>
+                                </div>
+                        </div>
+                </div>
+        </footer>
+
+        <script>
+                // Simple counter animation script
+                document.addEventListener('DOMContentLoaded', () => {
+                        const counterElement = document.getElementById('counter');
+                        let start = 12000;
+                        const end = 12450;
+                        const duration = 2000;
+                        const stepTime = Math.abs(Math.floor(duration / (end - start)));
+
+                        const timer = setInterval(() => {
+                                start += 5;
+                                if (start > end) start = end;
+                                counterElement.textContent = start.toLocaleString();
+                                if (start === end) {
+                                        clearInterval(timer);
+                                }
+                        }, stepTime);
+                });
+        </script>
+</body>
+
+</html>
