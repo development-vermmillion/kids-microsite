@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use App\Models\Ride;
 use App\Models\Setting;
-use Illuminate\Pagination\Paginator;
 use App\Support\CurrentRider;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 

@@ -33,6 +33,7 @@ class DashboardController extends Controller
             'recentRides' => Ride::with('rider')
                 ->whereIn('status', [Ride::STATUS_VERIFIED, Ride::STATUS_REJECTED])
                 ->latest('reviewed_at')
+                ->latest('id')
                 ->take(5)
                 ->get(),
         ]);
