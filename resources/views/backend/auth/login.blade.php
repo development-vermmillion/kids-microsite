@@ -22,6 +22,10 @@
 
             <form method="POST" action="{{ route('admin.login.attempt') }}">
                 @csrf
+                <x-bot-guard />
+                @if (session('error'))
+                    <div class="error" style="margin-bottom:14px">{{ session('error') }}</div>
+                @endif
                 <div class="field @error('email') has-error @enderror">
                     <label for="email">Email</label>
                     <input class="input" id="email" type="email" name="email" value="{{ old('email') }}" required
@@ -41,12 +45,14 @@
                 <div class="field">
                     <label class="check"><input type="checkbox" name="remember" value="1" /> Keep me signed in</label>
                 </div>
+                <x-turnstile action="admin-login" class="field" />
                 <button type="submit" class="btn btn-primary">
                     Sign in <span class="material-symbols-outlined">arrow_forward</span>
                 </button>
             </form>
         </div>
     </div>
+    @stack('scripts')
 </body>
 
 </html>

@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Rider extends Model
 {
     protected $fillable = [
-        'name', 'mobile', 'avatar', 'level', 'is_active',
+        'name', 'username', 'email', 'email_verified_at', 'mobile', 'avatar', 'level', 'is_active',
     ];
+
+    /** Usernames: 3-20 letters, numbers, dots or underscores. */
+    public const USERNAME_REGEX = '/^[a-z0-9_.]{3,20}$/';
 
     /** Same defaults as the database, so new riders are active straight away. */
     protected $attributes = [
@@ -23,8 +26,25 @@ class Rider extends Model
     {
         return [
             'last_login_at' => 'datetime',
+            'email_verified_at' => 'datetime',
             'is_active' => 'boolean',
         ];
+    }
+
+    /** Usernames and emails are stored in lower case, so "Alex" and "alex" are the same. */
+    public function setUsernameAttribute(?string $value): void
+    {
+        $this->attributes['username'] = $value === null || trim($value) === '' ? null : mb_strtolower(trim($value));
+    }
+
+    public function setEmailAttribute(?string $value): void
+    {
+        $this->attributes['email'] = $value === null || trim($value) === '' ? null : mb_strtolower(trim($value));
+    }
+
+    public function getHasVerifiedEmailAttribute(): bool
+    {
+        return $this->email && $this->email_verified_at;
     }
 
     public function rides(): HasMany

@@ -2,26 +2,30 @@
 
 namespace App\Support;
 
+use App\Mail\OtpCodeMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 /**
- * Sends and checks one-time passwords for a mobile number.
+ * Emails one-time codes for registering ("register") and logging in ("login"),
+ * and checks them.
  *
- * Test mode: while OTP_TEST_CODE is set (default 1234) every OTP is that code
- * and no SMS is sent. To go live, set OTP_TEST_CODE= (empty) in .env and fill
- * in sendSms() with your SMS provider (MSG91, Twilio, etc.).
+ * Codes are 6 digits, valid for 10 minutes, allow 5 tries, and a new code can be
+ * requested once a minute. Only a hash of the code is stored.
+ *
+ * Local testing: while OTP_TEST_CODE is set, every code is that value and no
+ * email is sent.
  */
 class OtpService
 {
-    public const EXPIRES_MINUTES = 10;
+    public const PURPOSES = ['register', 'login'];
 
-    public const MAX_ATTEMPTS = 5;
-
-    public static function normalise(?string $mobile): string
+    public static function normaliseEmail(?string $email): string
     {
-        return preg_replace('/[^0-9+]/', '', (string) $mobile);
+        return mb_strtolower(trim((string) $email));
     }
 
     public static function testCode(): ?string
@@ -31,63 +35,87 @@ class OtpService
         return $code !== null && $code !== '' ? (string) $code : null;
     }
 
-    /** Creates a fresh code for the number (replacing any earlier one) and sends it. */
-    public function send(string $mobile): void
+    public static function expiresMinutes(): int
     {
-        $mobile = self::normalise($mobile);
-        $code = self::testCode() ?? (string) random_int(1000, 9999);
+        return (int) config('kidsavon.otp.expires_minutes', 10);
+    }
+
+    /**
+     * Creates a fresh code (replacing any earlier one) and emails it.
+     * Returns null when sent, otherwise a message to show the rider.
+     */
+    public function send(string $email, string $purpose, ?string $name = null): ?string
+    {
+        $email = self::normaliseEmail($email);
+        $existing = DB::table('otp_codes')->where(compact('email', 'purpose'))->first();
+
+        $wait = (int) config('kidsavon.otp.resend_seconds', 60);
+        if ($existing && now()->diffInSeconds($existing->created_at, true) < $wait) {
+            $left = $wait - (int) now()->diffInSeconds($existing->created_at, true);
+
+            return "We just sent a code. You can ask for a new one in {$left} seconds.";
+        }
+
+        $length = (int) config('kidsavon.otp.length', 6);
+        $code = self::testCode() ?? str_pad((string) random_int(0, 10 ** $length - 1), $length, '0', STR_PAD_LEFT);
 
         DB::table('otp_codes')->updateOrInsert(
-            ['mobile' => $mobile],
+            compact('email', 'purpose'),
             [
                 'code_hash' => Hash::make($code),
                 'attempts' => 0,
-                'expires_at' => now()->addMinutes(self::EXPIRES_MINUTES),
+                'expires_at' => now()->addMinutes(self::expiresMinutes()),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         );
 
-        if (! self::testCode()) {
-            $this->sendSms($mobile, "Your Kids Avon OTP is {$code}. It is valid for ".self::EXPIRES_MINUTES.' minutes.');
+        if (self::testCode()) {
+            return null;
         }
+
+        try {
+            Mail::to($email)->send(new OtpCodeMail($code, $purpose, $name, self::expiresMinutes()));
+        } catch (Throwable $e) {
+            report($e);
+            Log::error("OTP email to {$email} could not be sent: ".$e->getMessage());
+            DB::table('otp_codes')->where(compact('email', 'purpose'))->delete();
+
+            return 'We could not send the email right now. Please try again in a minute.';
+        }
+
+        return null;
     }
 
     /**
      * Checks a code. Returns null when it is correct (and uses it up),
      * otherwise a message to show the rider.
      */
-    public function check(string $mobile, ?string $code): ?string
+    public function check(string $email, string $purpose, ?string $code): ?string
     {
-        $mobile = self::normalise($mobile);
-        $row = DB::table('otp_codes')->where('mobile', $mobile)->first();
+        $email = self::normaliseEmail($email);
+        $row = DB::table('otp_codes')->where(compact('email', 'purpose'))->first();
 
         if (! $row) {
-            return 'Please tap “Send OTP” first.';
+            return 'Please tap “Send OTP” first and check your email.';
         }
 
         if (now()->greaterThan($row->expires_at)) {
-            return 'This OTP has expired. Please send a new one.';
+            return 'This code has expired. Please send a new one.';
         }
 
-        if ($row->attempts >= self::MAX_ATTEMPTS) {
-            return 'Too many wrong tries. Please send a new OTP.';
+        if ($row->attempts >= (int) config('kidsavon.otp.max_attempts', 5)) {
+            return 'Too many wrong tries. Please send a new code.';
         }
 
-        if (! Hash::check(trim((string) $code), $row->code_hash)) {
+        if (! Hash::check(preg_replace('/\s+/', '', (string) $code), $row->code_hash)) {
             DB::table('otp_codes')->where('id', $row->id)->increment('attempts');
 
-            return 'That OTP is not right. Please check and try again.';
+            return 'That code is not right. Please check your email and try again.';
         }
 
         DB::table('otp_codes')->where('id', $row->id)->delete();
 
         return null;
-    }
-
-    /** Hook for a real SMS provider. Until one is connected the message is only logged. */
-    protected function sendSms(string $mobile, string $message): void
-    {
-        Log::info("OTP SMS to {$mobile}: {$message}");
     }
 }

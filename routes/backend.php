@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('login', [AuthController::class, 'login'])->name('login.attempt')->middleware('throttle:admin-login');
+    Route::post('login', [AuthController::class, 'login'])->name('login.attempt')->middleware(['bot-guard', 'throttle:admin-login', 'turnstile']);
 });
 
 Route::middleware('auth')->group(function () {

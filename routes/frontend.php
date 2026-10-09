@@ -18,21 +18,21 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Mobile number + OTP login / sign-up
+// Register and log in with an email OTP. Every form has the invisible bot traps
+// (bot-guard) and the Cloudflare robot check (turnstile).
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.attempt')->middleware('throttle:rider-login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.attempt')->middleware(['bot-guard', 'throttle:rider-login', 'turnstile']);
 Route::get('/join', [AuthController::class, 'showJoin'])->name('join');
-Route::post('/join', [AuthController::class, 'join'])->name('join.attempt')->middleware('throttle:rider-login');
-Route::post('/otp/send', [AuthController::class, 'sendOtp'])->name('otp.send')->middleware('throttle:otp');
+Route::post('/join', [AuthController::class, 'join'])->name('join.attempt')->middleware(['bot-guard', 'throttle:rider-login', 'turnstile']);
+Route::post('/otp/send', [AuthController::class, 'sendOtp'])->name('otp.send')->middleware(['bot-guard', 'throttle:otp', 'turnstile']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Open to everyone (the upload form asks guests for mobile + OTP)
-Route::get('/upload-ride', [RideController::class, 'create'])->name('rides.create');
-Route::post('/upload-ride', [RideController::class, 'store'])->name('rides.store')->middleware('throttle:ride-upload');
 Route::get('/challenges', [ChallengeController::class, 'index'])->name('challenges.index');
 
 // Logged-in riders only
 Route::middleware('rider')->group(function () {
+    Route::get('/upload-ride', [RideController::class, 'create'])->name('rides.create');
+    Route::post('/upload-ride', [RideController::class, 'store'])->name('rides.store')->middleware(['bot-guard', 'throttle:ride-upload']);
     Route::post('/challenges/{challenge}/join', [ChallengeController::class, 'join'])->name('challenges.join');
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress');
     Route::get('/progress/history', [ProgressController::class, 'history'])->name('progress.history');

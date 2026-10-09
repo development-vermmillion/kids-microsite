@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Badge;
 use App\Models\Challenge;
 use App\Models\Faq;
+use App\Models\Ride;
 use App\Models\Rider;
 use App\Models\Setting;
 use App\Support\ProgressService;
@@ -30,6 +31,13 @@ class KidsAvonDemoSeeder extends Seeder
         $challenges = $this->seedChallenges($badges);
         $this->seedLeaderboardRiders();
         $this->seedDemoRider($badges, $challenges);
+
+        // Demo rides were "uploaded" on the day they were ridden (this matters for
+        // the rides-per-day upload limit).
+        Ride::query()->each(function (Ride $ride) {
+            $at = $ride->ride_date->copy()->setTimeFromTimeString($ride->ride_time ?? '12:00:00');
+            $ride->forceFill(['created_at' => $at, 'updated_at' => $at])->saveQuietly();
+        });
 
         // Work out everyone's automatic challenge and badge progress from their rides.
         app(ProgressService::class)->recalculateAll();
@@ -82,6 +90,8 @@ class KidsAvonDemoSeeder extends Seeder
 
         // Badges that unlock automatically from verified rides: name => [metric, target].
         $automatic = [
+            'Power Pedal' => ['ride_days', 5],
+            'Early Bird' => ['morning_rides', 3],
             'Century Club' => ['distance', 100],
         ];
 
@@ -154,7 +164,11 @@ class KidsAvonDemoSeeder extends Seeder
         ];
 
         foreach ($riders as $index => [$name, $mobile, $avatar, $level, $rides]) {
-            $rider = Rider::create(compact('name', 'mobile', 'avatar', 'level'));
+            $username = str_replace([' ', '.'], ['_', ''], strtolower($name));
+            $rider = Rider::create(compact('name', 'username', 'mobile', 'avatar', 'level') + [
+                'email' => $username.'@kidsavon.test',
+                'email_verified_at' => now(),
+            ]);
 
             // A couple of uploads waiting in the admin review queue.
             if (in_array($index, [1, 2], true)) {
@@ -191,6 +205,9 @@ class KidsAvonDemoSeeder extends Seeder
     {
         $alex = Rider::create([
             'name' => 'Alex Rider',
+            'username' => 'alex_rider',
+            'email' => config('kidsavon.demo_rider_email'),
+            'email_verified_at' => now(),
             'mobile' => config('kidsavon.demo_rider_mobile'),
             'avatar' => self::AVATAR,
             'level' => 12,
@@ -229,12 +246,12 @@ class KidsAvonDemoSeeder extends Seeder
         // Badges: unlocked ones get a date, locked ones a progress percentage.
         $badgeState = [
             'Speed Star' => ['unlocked_at' => '2026-05-10', 'progress_percent' => 100],
-            'Power Pedal' => ['unlocked_at' => null, 'progress_percent' => 0],
+            'Power Pedal' => ['unlocked_at' => null, 'progress_percent' => 0], // calculated from rides
             'Champion' => ['unlocked_at' => null, 'progress_percent' => 0],
             'Explorer' => ['unlocked_at' => '2026-08-02', 'progress_percent' => 100],
             'Speedster' => ['unlocked_at' => '2026-07-15', 'progress_percent' => 100],
             'Park Hopper' => ['unlocked_at' => '2026-06-28', 'progress_percent' => 100],
-            'Early Bird' => ['unlocked_at' => null, 'progress_percent' => 0],
+            'Early Bird' => ['unlocked_at' => null, 'progress_percent' => 0], // calculated from rides
             'Social Butterfly' => ['unlocked_at' => null, 'progress_percent' => 40],
             'Century Club' => ['unlocked_at' => null, 'progress_percent' => 0], // calculated from rides
         ];

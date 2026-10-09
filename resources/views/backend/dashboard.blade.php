@@ -33,6 +33,17 @@
         </div>
     </div>
 
+    @if ($setupWarnings)
+        <div class="card card-pad setup-warnings">
+            <h2><span class="material-symbols-outlined">construction</span> Before going live</h2>
+            <ul>
+                @foreach ($setupWarnings as $warning)
+                    <li>{{ $warning }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="stat-grid">
         <div class="card stat">
             <div class="icon tone-amber"><span class="material-symbols-outlined">hourglass_empty</span></div>

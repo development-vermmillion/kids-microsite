@@ -36,7 +36,8 @@ class RideController extends Controller
             ->when(in_array($status, ['pending', 'verified', 'rejected'], true), fn ($q) => $q->where('status', $status))
             ->when($search !== '', fn ($q) => $q->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhereHas('rider', fn ($r) => $r->where('name', 'like', "%{$search}%")->orWhere('mobile', 'like', "%{$search}%"));
+                    ->orWhereHas('rider', fn ($r) => $r->where('name', 'like', "%{$search}%")->orWhere('mobile', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")->orWhere('username', 'like', "%{$search}%"));
             }))
             // Pending rides: oldest first (fair queue). Others: newest first.
             ->when($status === 'pending', fn ($q) => $q->oldest(), fn ($q) => $q->latest('ride_date')->latest('id'))

@@ -6,7 +6,7 @@ use App\Models\Rider;
 use Illuminate\Support\Facades\Session;
 
 /**
- * The rider who is logged in on the website (mobile number + OTP).
+ * The rider who is logged in on the website (email + OTP).
  * Guests get null.
  */
 class CurrentRider

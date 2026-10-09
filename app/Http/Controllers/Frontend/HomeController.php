@@ -30,20 +30,8 @@ class HomeController extends Controller
 
         $unlocked = $riderBadges->filter(fn ($b) => $b->pivot->unlocked_at);
 
-        // Next badge: the locked badge the rider is closest to (works for brand-new riders too).
-        $nextBadge = null;
-        if ($rider) {
-            $nextBadge = $allBadges
-                ->reject(fn ($b) => $riderBadges->get($b->id)?->pivot->unlocked_at)
-                ->filter(fn ($b) => $b->is_auto || $riderBadges->has($b->id))
-                ->map(function ($b) use ($rider, $riderBadges, $service) {
-                    $b->percent = $service->badgePercent($rider, $b, $riderBadges->get($b->id)?->pivot);
-
-                    return $b;
-                })
-                ->sortByDesc('percent')
-                ->first();
-        }
+        // Next badge: the ride-based badge the rider is closest to (see ProgressService::nextBadge).
+        $nextBadge = $rider ? $service->nextBadge($rider) : null;
 
         $communityGoal = (float) Setting::get('community_goal_km', 150);
         $communityProgress = (float) Setting::get('community_progress_km', 0);

@@ -40,21 +40,19 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::defaultView('backend.partials.pagination');
 
-        // "Send OTP": 3 per minute per mobile number, and a generous cap per
-        // connection (schools and families often share one internet connection).
-        RateLimiter::for('otp', function (Request $request) {
-            $mobile = \App\Support\OtpService::normalise($request->input('mobile'));
-
-            return [
-                Limit::perMinute(3)->by('otp-mobile:'.$mobile),
-                Limit::perMinute(30)->by('otp-ip:'.$request->ip()),
-            ];
-        });
+        // "Send OTP": 3 emails per minute per address (plus the 60-second wait in
+        // OtpService), and a generous cap per connection (schools and families
+        // often share one internet connection).
+        RateLimiter::for('otp', fn (Request $request) => [
+            Limit::perMinute(3)->by('otp-email:'.\App\Support\OtpService::normaliseEmail($request->input('email'))),
+            Limit::perHour(20)->by('otp-email-hour:'.\App\Support\OtpService::normaliseEmail($request->input('email'))),
+            Limit::perMinute(30)->by('otp-ip:'.$request->ip()),
+        ]);
 
         // Each action gets its own counter, so a busy website can never lock
         // the admin out (plain throttle:N,1 limits share one counter per IP).
         RateLimiter::for('rider-login', fn (Request $request) => [
-            Limit::perMinute(10)->by('rider-login-mobile:'.\App\Support\OtpService::normalise($request->input('mobile'))),
+            Limit::perMinute(10)->by('rider-login-email:'.\App\Support\OtpService::normaliseEmail($request->input('email'))),
             Limit::perMinute(60)->by('rider-login-ip:'.$request->ip()),
         ]);
         RateLimiter::for('ride-upload', fn (Request $request) => Limit::perMinute(20)->by('ride-upload:'.(session('rider_id') ?: $request->ip())));

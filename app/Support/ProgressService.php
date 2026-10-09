@@ -97,6 +97,55 @@ class ProgressService
         return (int) ($pivot->progress_percent ?? 0);
     }
 
+    /** Words for "… to go" on the Next Badge card: metric => [one, many]. */
+    public const METRIC_UNITS = [
+        'distance' => ['km', 'km'],
+        'rides' => ['more ride', 'more rides'],
+        'ride_days' => ['more day of riding', 'more days of riding'],
+        'morning_rides' => ['more morning ride', 'more morning rides'],
+    ];
+
+    /**
+     * The badge a rider can earn next by riding: the locked automatic badge they
+     * are closest to (highest %, then the admin's badge order). Badges the admin
+     * awards by hand are left out, because rides don't move them.
+     *
+     * Returns the badge with extra fields: percent, value, target, pending,
+     * pending_percent and to_go (e.g. "3.5 km to go"). Null when every
+     * ride-based badge is already unlocked.
+     */
+    public function nextBadge(Rider $rider): ?Badge
+    {
+        $unlocked = $rider->badges()->wherePivotNotNull('unlocked_at')->pluck('badges.id');
+
+        return Badge::query()
+            ->where('metric', '!=', 'manual')
+            ->where('target_value', '>', 0)
+            ->whereNotIn('id', $unlocked)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(function (Badge $badge) use ($rider) {
+                $target = (float) $badge->target_value;
+                $value = $this->metricValue($rider, $badge->metric);
+                $pending = $this->metricValue($rider, $badge->metric, status: Ride::STATUS_PENDING);
+
+                $badge->value = $value;
+                $badge->target = $target;
+                $badge->percent = (int) min(100, floor($value / $target * 100));
+                $badge->pending = $pending;
+                $badge->pending_percent = (int) max(0, min(100 - $badge->percent, floor(($value + $pending) / $target * 100) - $badge->percent));
+
+                $left = max(0, $target - $value);
+                [$one, $many] = self::METRIC_UNITS[$badge->metric] ?? ['', ''];
+                $badge->to_go = Format::number($left).' '.($left == 1 ? $one : $many).' to go';
+
+                return $badge;
+            })
+            ->sortBy([['percent', 'desc'], ['sort_order', 'asc']])
+            ->first();
+    }
+
     private function recalculateChallenges(Rider $rider): void
     {
         foreach ($rider->challenges()->get() as $challenge) {

@@ -19,8 +19,12 @@
 
         <div class="card-pad form-grid">
             <x-admin.input name="name" label="Rider name" :value="$rider->name" required />
+            <x-admin.input name="username" label="Username" :value="$rider->username"
+                hint="3–20 letters, numbers, dots or underscores. Must be unique." />
+            <x-admin.input name="email" type="email" label="Email" :value="$rider->email"
+                hint="The rider logs in with a code sent to this email. Must be unique." />
             <x-admin.input name="mobile" type="tel" label="Mobile number" :value="$rider->mobile" required
-                hint="Used to log in with OTP. Must be unique." />
+                hint="Contact number (a parent's number can be shared by brothers and sisters)." />
             <x-admin.input name="level" type="number" min="1" label="Level" :value="$rider->level" required
                 hint="Shown in the header as “Level 12 Cyclist”." />
             <x-admin.checkbox name="is_active" label="Active (shown on the leaderboard)" :checked="$rider->is_active" />

@@ -61,7 +61,8 @@ The original static HTML is kept for reference in `docs/original-html`
 
 | Table | Holds |
 |---|---|
-| `riders` | Kids using the site (name, mobile, avatar, level, OTP fields) |
+| `riders` | Kids using the site (name, username, email + when it was verified, mobile, avatar, level) |
+| `otp_codes` | Email codes waiting to be used (only a hash of each code is stored) |
 | `rides` | Uploaded rides — date, time, km, duration, proof image, status `pending / verified / rejected` |
 | `challenges` + `challenge_rider` | Challenges and each rider's progress on the ones they accepted |
 | `badges` + `badge_rider` | Badges/trophies; per rider: unlock date or progress % |
@@ -115,36 +116,95 @@ Each challenge and badge has a **"How progress is counted"** rule:
   later, the challenge re-opens.
 - **Badges** with an automatic rule count all-time rides and unlock by
   themselves at the goal. A badge is never locked again automatically.
+- **Next Badge** (home page) is the locked badge with an automatic rule the
+  rider is closest to (highest %, then badge order), with what's left to do
+  (“64.3 km to go”) and rides waiting for review as a striped bar. Badges set by
+  the admin aren't shown there, because rides don't move them. In the demo data
+  Power Pedal (5 days ridden), Early Bird (3 morning rides) and Century Club
+  (100 km) are automatic.
 - Riders join challenges with **Accept Challenge**; **Log Progress** opens the
   upload form. Challenges are only shown while live and within their dates.
 
 ## Website features
 
-Upload Ride (saved as pending with the photo proof, validated, duplicate
-check, new mobile numbers create a new rider), Accept Challenge, Log Progress,
+Upload Ride (logged-in riders; saved as pending with the photo proof, validated,
+duplicate check, up to 3 uploads per rider per day), Accept Challenge, Log Progress,
 My Progress, View All History (with filters), Trophy Room, notifications
-(unread count in the header, marked seen when opened), Settings (name and
-photo), Log Out.
+(unread count in the header, marked seen when opened), Settings (name, mobile
+and photo), Log Out.
 
 The site runs on India time (`APP_TIMEZONE=Asia/Kolkata`), so "today" and
 "before 9 AM" match the riders' clocks.
 
-## Rider login (mobile number + OTP)
+## Rider registration and login (email + OTP)
 
-- **Log in:** `/login`, enter mobile number, tap **Send OTP**, enter the OTP.
-- **Join:** `/join` (“Join the Adventure”): name + mobile number + OTP.
-- **Upload Ride without logging in:** guests confirm their number with an OTP
-  on the form; a new number creates a rider, and they are logged in after.
-- Progress, ride history, trophies, alerts, settings and joining challenges need
-  a logged-in rider; other pages are open to everyone.
+- **Join:** `/join` (“Join the Adventure”): rider name, username, mobile number
+  and Gmail/email ID. Tap **Send OTP to my email**, type the 6-digit code from
+  the email, then **Create My Account**. The account is created with the email
+  marked as verified. Taken usernames and already-registered emails are caught
+  before the email goes out.
+- **Log in:** `/login`: email → **Send OTP to my email** → code → **Let's Ride!**
+- Uploading rides, progress, ride history, trophies, alerts, settings and
+  joining challenges need a logged-in rider; other pages are open to everyone.
+- Codes: 6 digits, valid 10 minutes, usable once, 5 tries; a new code can be
+  sent once a minute (and at most 3 a minute / 20 an hour per email).
+- The mobile number is contact information only (a parent's number can be shared
+  by brothers and sisters). Admins can change a rider's email or username in
+  Admin → Riders; a changed email counts as verified after the rider's next login.
+- Demo rider: `alex@kidsavon.test` (with `OTP_TEST_CODE` set, see below).
 
-**Testing mode:** while `OTP_TEST_CODE=1234` is set in `.env` (the default),
-every OTP is **1234** and no SMS is sent. Demo rider: mobile `9999999999`.
+**Local testing without email:** set `OTP_TEST_CODE=1234` in `.env`; then no
+email is sent and every code is 1234. **Leave it empty on the live site.**
 
-**Before launch:** set `OTP_TEST_CODE=` (empty) and connect an SMS provider
-(e.g. MSG91 or Twilio) in `sendSms()` in `app/Support/OtpService.php`.
-OTPs last 10 minutes, allow 5 tries, and can be sent 3 times a minute per
-number.
+## Sending OTP emails (SMTP) and keeping them out of spam
+
+Fill in the `MAIL_*` lines in `.env`. Any SMTP mailbox works, for example:
+
+| Option | MAIL_HOST | MAIL_PORT | MAIL_USERNAME / MAIL_PASSWORD | MAIL_FROM_ADDRESS |
+|---|---|---|---|---|
+| Your hosting's email (cPanel etc.) – recommended | `mail.yourdomain.com` | `587` | the mailbox and its password | that same mailbox, e.g. `noreply@yourdomain.com` |
+| Brevo (free: ~300 emails/day) | `smtp-relay.brevo.com` | `587` | SMTP login + SMTP key from Brevo | an address on a domain verified in Brevo |
+| Gmail (testing / small use) | `smtp.gmail.com` | `587` | the Gmail address + an **App Password** (Google account → Security → 2-Step Verification → App passwords) | the same Gmail address |
+
+Then run `php artisan config:clear`.
+
+The email itself is written to avoid spam filters: a plain subject
+(“123456 is your Kids Avon verification code”), matching HTML and plain-text
+versions, no images, links or attachments, a Reply-To address (the support
+email from Site settings), and a unique reference so Gmail doesn't bundle codes
+together. What decides spam vs inbox most, though, is **proving the email
+really comes from your domain**. In your domain's DNS add:
+
+1. **SPF** – a TXT record on the domain, e.g. `v=spf1 include:<your mail provider> ~all`
+   (your host or Brevo tells you the exact value). Only one SPF record per domain.
+2. **DKIM** – the TXT/CNAME record your host or Brevo gives you (cPanel: *Email
+   Deliverability* → Repair/Install; Brevo: *Senders & domains* → Authenticate).
+3. **DMARC** – a TXT record at `_dmarc.yourdomain.com`: `v=DMARC1; p=none; rua=mailto:you@yourdomain.com`
+   (move to `p=quarantine` once everything passes).
+
+Always send **from the same domain you log in with** (never "from" a
+@gmail.com address through another server). Check the result by sending a code
+to the address shown on https://www.mail-tester.com (aim for 9/10 or more) and
+to a Gmail inbox: *Show original* should say SPF, DKIM and DMARC **PASS**.
+
+## Bot and spam protection
+
+- **Cloudflare Turnstile** robot check on Join, Log in, Send OTP and the admin
+  login. Usually invisible; sometimes a tick box. Set up: Cloudflare dashboard →
+  **Turnstile** → **Add widget** → add your website's domain (and `localhost` for
+  testing) → mode **Managed** → copy the **Site key** and **Secret key** into
+  `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` in `.env` → `php artisan config:clear`.
+  The keys in `.env.example` are Cloudflare's testing keys (they always pass).
+- **Hidden trap field:** every form has a box people never see; bots that fill
+  it in are quietly turned away (nothing saved, no email sent).
+- **Too-fast check:** forms sent back within 2 seconds of opening are treated
+  as bots (`kidsavon.bot_guard.min_seconds`).
+- **Upload limit:** 3 ride uploads per rider per day (change in Admin → Site
+  settings).
+- Rate limits on codes, logins, uploads and the admin login.
+
+The admin **Dashboard** shows a “Before going live” box while testing keys,
+OTP testing mode or an unconfigured mailer are still in use.
 
 ## Progress while rides wait for review
 

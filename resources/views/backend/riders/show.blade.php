@@ -15,7 +15,18 @@
                         <span class="pill pill-off">Hidden</span>
                     @endunless
                 </h1>
-                <p>{{ $rider->mobile }} · {{ $rider->level_title }} · joined {{ $rider->created_at->format('d M Y') }}</p>
+                <p>
+                    @if ($rider->username){{ '@'.$rider->username }} · @endif
+                    {{ $rider->email ?: 'No email' }}
+                    @if ($rider->email)
+                        @if ($rider->email_verified_at)
+                            <span class="pill pill-verified">Email verified</span>
+                        @else
+                            <span class="pill pill-pending">Email not verified yet</span>
+                        @endif
+                    @endif
+                    · {{ $rider->mobile }} · {{ $rider->level_title }} · joined {{ $rider->created_at->format('d M Y') }}
+                </p>
             </div>
         </div>
         <div class="page-actions">
@@ -53,7 +64,7 @@
     <div class="card">
         <div class="card-head">
             <h2>Rides</h2>
-            <a href="{{ route('admin.rides.index', ['q' => $rider->mobile]) }}">All of this rider's rides</a>
+            <a href="{{ route('admin.rides.index', ['q' => $rider->email ?: $rider->mobile]) }}">All of this rider's rides</a>
         </div>
         <div class="table-wrap">
             <table class="table">

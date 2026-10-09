@@ -19,7 +19,7 @@
 
     <div class="card">
         <form method="GET" class="filters">
-            <input type="search" name="q" value="{{ $search }}" class="input" placeholder="Search name or mobile" />
+            <input type="search" name="q" value="{{ $search }}" class="input" placeholder="Search name, username, email or mobile" />
             <select name="sort" class="input" onchange="this.form.submit()">
                 <option value="km" @selected($sort === 'km')>Sort: most km</option>
                 <option value="name" @selected($sort === 'name')>Sort: name A–Z</option>
@@ -33,7 +33,7 @@
                 <thead>
                     <tr>
                         <th>Rider</th>
-                        <th>Mobile</th>
+                        <th>Contact</th>
                         <th class="num">Level</th>
                         <th class="num">Verified km</th>
                         <th class="num">Rides</th>
@@ -51,7 +51,16 @@
                                     <a href="{{ route('admin.riders.show', $rider) }}">{{ $rider->name }}</a>
                                 </div>
                             </td>
-                            <td>{{ $rider->mobile }}</td>
+                            <td>
+                                @if ($rider->email)
+                                    <div>{{ $rider->email }}
+                                        @if ($rider->email_verified_at)
+                                            <span class="material-symbols-outlined verified-tick" title="Email verified">verified</span>
+                                        @endif
+                                    </div>
+                                @endif
+                                <div class="muted" style="font-size:12px">{{ $rider->username ? '@'.$rider->username.' · ' : '' }}{{ $rider->mobile }}</div>
+                            </td>
                             <td class="num">{{ $rider->level }}</td>
                             <td class="num"><strong>{{ Format::number($rider->total_km ?? 0) }}</strong></td>
                             <td class="num">

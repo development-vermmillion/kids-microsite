@@ -35,13 +35,31 @@
                         @error('name')<span class="field-error">{{ $message }}</span>@enderror
                     </div>
 
-                    <div class="input-group full-width">
-                        <label class="font-label-lg">Mobile Number</label>
+                    <div class="input-group">
+                        <label class="font-label-lg">Username</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon material-symbols-outlined">alternate_email</span>
+                            <input type="text" value="{{ $rider->username }}" disabled class="font-body-lg" />
+                        </div>
+                    </div>
+
+                    <div class="input-group @error('mobile') has-error @enderror">
+                        <label class="font-label-lg" for="mobile">Mobile Number</label>
                         <div class="input-wrapper">
                             <span class="input-icon material-symbols-outlined">smartphone</span>
-                            <input type="text" value="{{ $rider->mobile }}" disabled class="font-body-lg" />
+                            <input id="mobile" name="mobile" type="tel" inputmode="numeric" maxlength="14" required
+                                value="{{ old('mobile', $rider->mobile) }}" class="font-body-lg" />
                         </div>
-                        <p class="form-note">To change your mobile number, email {{ $supportEmail }}.</p>
+                        @error('mobile')<span class="field-error">{{ $message }}</span>@enderror
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label class="font-label-lg">Email</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon material-symbols-outlined">mail</span>
+                            <input type="text" value="{{ $rider->email }}" disabled class="font-body-lg" />
+                        </div>
+                        <p class="form-note">You log in with this email. To change your email or username, write to {{ $supportEmail }}.</p>
                     </div>
 
                     <div class="input-group full-width file-upload-group @error('avatar') has-error @enderror">

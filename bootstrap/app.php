@@ -24,11 +24,27 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
         $middleware->redirectUsersTo(fn () => route('admin.dashboard'));
 
-        // Website pages that need a logged-in rider (mobile + OTP).
-        $middleware->alias(['rider' => \App\Http\Middleware\RequireRider::class]);
+        $middleware->alias([
+            // Website pages that need a logged-in rider (email + OTP).
+            'rider' => \App\Http\Middleware\RequireRider::class,
+            // Invisible trap field + "sent too fast" check on forms.
+            'bot-guard' => \App\Http\Middleware\GuardAgainstBots::class,
+            // Cloudflare Turnstile robot check.
+            'turnstile' => \App\Http\Middleware\RequireTurnstile::class,
+        ]);
+
+        // Bot traps run before the rate limits, so turned-away bots don't use up
+        // a real visitor's tries.
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            prepend: \App\Http\Middleware\GuardAgainstBots::class,
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Never send these back to the browser when a form has an error.
+        $exceptions->dontFlash(['password', 'password_confirmation', 'current_password', 'otp', 'cf-turnstile-response', 'kv_website', 'kv_ts']);
     })->create();

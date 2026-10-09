@@ -29,6 +29,8 @@ class RiderController extends Controller
             ->withCount(['rides as pending_count' => fn ($q) => $q->where('status', 'pending')])
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$search}%")
+                ->orWhere('username', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
                 ->orWhere('mobile', 'like', "%{$search}%")))
             ->when($sort === 'name', fn ($q) => $q->orderBy('name'))
             ->when($sort === 'newest', fn ($q) => $q->latest())
@@ -192,14 +194,32 @@ class RiderController extends Controller
 
     private function validated(Request $request, ?Rider $rider = null): array
     {
-        return $request->validate([
+        $request->merge([
+            'username' => mb_strtolower(trim((string) $request->input('username'))) ?: null,
+            'email' => mb_strtolower(trim((string) $request->input('email'))) ?: null,
+        ]);
+
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:100'],
-            'mobile' => ['required', 'regex:/^[0-9+\- ]{8,15}$/', Rule::unique('riders', 'mobile')->ignore($rider?->id)],
+            'username' => ['nullable', 'regex:'.Rider::USERNAME_REGEX, Rule::unique('riders', 'username')->ignore($rider?->id)],
+            'email' => ['nullable', 'email:rfc', 'max:120', Rule::unique('riders', 'email')->ignore($rider?->id)],
+            'mobile' => ['required', 'regex:/^[0-9+\- ]{8,15}$/'],
             'level' => ['required', 'integer', 'min:1', 'max:999'],
             'is_active' => ['boolean'],
             'avatar' => ['nullable', 'image', 'max:2048'],
         ], [
             'mobile.regex' => 'Enter a valid mobile number (digits only, 8–15 characters).',
+            'username.regex' => 'Use 3–20 letters, numbers, dots or underscores (no spaces).',
+            'username.unique' => 'Another rider already has this username.',
+            'email.unique' => 'Another rider already uses this email.',
         ]);
+
+        // A changed email has to be confirmed again: it counts as verified the
+        // first time the rider logs in with a code sent to it.
+        if ($data['email'] !== $rider?->email) {
+            $data['email_verified_at'] = null;
+        }
+
+        return $data;
     }
 }

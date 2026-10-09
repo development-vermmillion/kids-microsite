@@ -32,12 +32,15 @@
             <x-admin.checkbox name="auto_approve_rides" label="Count rides as soon as they are uploaded (skip review)"
                 :checked="(bool) $values['auto_approve_rides']" full
                 hint="Off (recommended): new rides wait in Ride review and only count once you verify them; riders see them as “waiting for review”. On: rides count straight away. You can still reject a ride later and the rider's progress goes back down." />
+            <x-admin.input name="max_rides_per_day" type="number" min="1" max="20" label="Ride uploads allowed per rider per day"
+                :value="$values['max_rides_per_day']" required
+                hint="Stops spam uploads. Counts every upload a rider makes today (from midnight), whatever its status." />
         </div>
 
         <div class="card-head" style="border-top:1px solid var(--line)"><h2>Contact</h2></div>
         <div class="card-pad form-grid">
             <x-admin.input name="support_email" type="email" label="Help & Support email" :value="$values['support_email']" required
-                hint="Shown in the footer of every page." />
+                hint="Shown in the footer of every page, and used as the Reply-To address of OTP emails." />
         </div>
 
         <div class="form-actions">

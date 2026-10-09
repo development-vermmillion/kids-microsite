@@ -4,17 +4,52 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | OTP login
+    | Email OTP (registration and login)
     |--------------------------------------------------------------------------
     |
-    | While test_code is set, every OTP is this code and no SMS is sent.
-    | Before launch, set OTP_TEST_CODE= (empty) in .env and connect an SMS
-    | provider in app/Support/OtpService.php.
+    | Codes are emailed through the SMTP server set in the MAIL_* settings.
+    | test_code is for local testing only: while it is set, every OTP is that
+    | code and no email is sent. Leave OTP_TEST_CODE empty on the live site.
     |
     */
 
     'otp' => [
-        'test_code' => env('OTP_TEST_CODE', '1234'),
+        'test_code' => env('OTP_TEST_CODE'),
+        'length' => 6,
+        'expires_minutes' => 10,
+        'max_attempts' => 5,
+        'resend_seconds' => 60,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cloudflare Turnstile (robot check)
+    |--------------------------------------------------------------------------
+    |
+    | Create a widget at dash.cloudflare.com > Turnstile and paste its two keys
+    | into .env. The 1x0000… keys in .env.example are Cloudflare's official
+    | testing keys: they always pass, so replace them before going live.
+    | With no site key at all, the robot check is switched off.
+    |
+    */
+
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret_key' => env('TURNSTILE_SECRET_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Bot trap
+    |--------------------------------------------------------------------------
+    |
+    | Forms carry an invisible "trap" field that only bots fill in, and a
+    | signed timestamp: anything sent back faster than this is a bot.
+    |
+    */
+
+    'bot_guard' => [
+        'min_seconds' => 2,
     ],
 
     /*
@@ -22,11 +57,11 @@ return [
     | Demo rider
     |--------------------------------------------------------------------------
     |
-    | Mobile number of the demo rider ("Alex Rider") created by the
-    | KidsAvonDemoSeeder. Log in with it and the test OTP to try the site.
+    | Email of the demo rider ("Alex Rider") created by KidsAvonDemoSeeder.
     |
     */
 
+    'demo_rider_email' => env('DEMO_RIDER_EMAIL', 'alex@kidsavon.test'),
     'demo_rider_mobile' => env('DEMO_RIDER_MOBILE', '9999999999'),
 
     /*

@@ -41,6 +41,8 @@
                 <dl class="kv">
                     <dt>Rider</dt>
                     <dd><a href="{{ route('admin.riders.show', $ride->rider) }}">{{ $ride->rider->name }}</a></dd>
+                    <dt>Email</dt>
+                    <dd>{{ $ride->rider->email ?: '—' }}</dd>
                     <dt>Mobile</dt>
                     <dd>{{ $ride->rider->mobile }}</dd>
                     <dt>Ride date</dt>

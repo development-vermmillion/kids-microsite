@@ -99,12 +99,37 @@
                                             <p class="title font-headline-sm">Next Badge: {{ $nextBadge->name }}</p>
                                             <span class="percentage font-headline-sm">{{ $nextBadge->percent }}%</span>
                                         </div>
-                                        <div class="bar-container">
-                                            <div class="bar-fill" style="width: {{ max($nextBadge->percent, 12) }}%;">
-                                                <span class="material-symbols-outlined icon">local_fire_department</span>
-                                                <div class="glass"></div>
-                                            </div>
+                                        <div class="bar-container next-badge-bar">
+                                            @if ($nextBadge->percent > 0)
+                                                <div class="bar-fill" style="width: {{ $nextBadge->percent }}%;">
+                                                    @if ($nextBadge->percent >= 12)
+                                                        <span class="material-symbols-outlined icon">local_fire_department</span>
+                                                    @endif
+                                                    <div class="glass"></div>
+                                                </div>
+                                            @endif
+                                            @if ($nextBadge->pending_percent)
+                                                <div class="progress-pending pending-secondary" style="width: {{ $nextBadge->pending_percent }}%;"
+                                                    title="Waiting for review"></div>
+                                            @endif
                                         </div>
+                                        <p class="next-badge-goal">
+                                            {{ $nextBadge->description }}
+                                            <strong>{{ $nextBadge->to_go }}</strong>
+                                        </p>
+                                        @if ($nextBadge->pending > 0)
+                                            <p class="pending-note">
+                                                <span class="material-symbols-outlined">hourglass_top</span>
+                                                +{{ \App\Support\Format::number($nextBadge->pending) }}{{ $nextBadge->metric === 'distance' ? ' km' : '' }} waiting for review
+                                            </p>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="next-badge next-badge-done">
+                                        <p class="title font-headline-sm">
+                                            <span class="material-symbols-outlined">workspace_premium</span>
+                                            You've earned every ride badge. Amazing!
+                                        </p>
                                     </div>
                                 @endif
                                 <div class="stats-grid">

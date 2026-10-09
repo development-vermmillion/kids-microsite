@@ -31,7 +31,7 @@
             @if ($status)
                 <input type="hidden" name="status" value="{{ $status }}" />
             @endif
-            <input type="search" name="q" value="{{ $search }}" class="input" placeholder="Search rider, mobile or ride"
+            <input type="search" name="q" value="{{ $search }}" class="input" placeholder="Search rider, email, mobile or ride"
                 style="margin-left:auto" />
             <button class="btn btn-light btn-sm" type="submit"><span class="material-symbols-outlined">search</span></button>
         </form>
