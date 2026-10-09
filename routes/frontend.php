@@ -21,10 +21,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Register and log in with an email OTP. Every form has the invisible bot traps
 // (bot-guard) and the Cloudflare robot check (turnstile).
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.attempt')->middleware(['bot-guard', 'throttle:rider-login', 'turnstile']);
+Route::post('/login', [AuthController::class, 'login'])->name('login.attempt')->middleware(['bot-guard', 'throttle:rider-login', 'turnstile:login']);
 Route::get('/join', [AuthController::class, 'showJoin'])->name('join');
-Route::post('/join', [AuthController::class, 'join'])->name('join.attempt')->middleware(['bot-guard', 'throttle:rider-login', 'turnstile']);
-Route::post('/otp/send', [AuthController::class, 'sendOtp'])->name('otp.send')->middleware(['bot-guard', 'throttle:otp', 'turnstile']);
+Route::post('/join', [AuthController::class, 'join'])->name('join.attempt')->middleware(['bot-guard', 'throttle:rider-login', 'turnstile:register']);
+Route::post('/otp/send', [AuthController::class, 'sendOtp'])->name('otp.send')->middleware(['bot-guard', 'throttle:otp', 'turnstile:login,register']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/challenges', [ChallengeController::class, 'index'])->name('challenges.index');

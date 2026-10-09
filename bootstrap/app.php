@@ -33,6 +33,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'turnstile' => \App\Http\Middleware\RequireTurnstile::class,
         ]);
 
+        // Behind Cloudflare: read the visitor's real IP and https from Cloudflare's
+        // headers (the trusted Cloudflare addresses are set in AppServiceProvider).
+        $middleware->trustProxies(
+            headers: Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_X_FORWARDED_PORT,
+        );
+
         // Bot traps run before the rate limits, so turned-away bots don't use up
         // a real visitor's tries.
         $middleware->prependToPriorityList(

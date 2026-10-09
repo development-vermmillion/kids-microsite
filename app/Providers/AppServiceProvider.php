@@ -27,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Requests that come through Cloudflare carry the visitor's real IP (config/kidsavon.php).
+        \Illuminate\Http\Middleware\TrustProxies::at(config('kidsavon.trusted_proxies'));
+
         // Every frontend view gets the current rider (header) and support email (footer).
         View::composer('frontend.*', function ($view) {
             $view->with('currentRider', app(CurrentRider::class)->get());

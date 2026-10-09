@@ -187,14 +187,37 @@ Always send **from the same domain you log in with** (never "from" a
 to the address shown on https://www.mail-tester.com (aim for 9/10 or more) and
 to a Gmail inbox: *Show original* should say SPF, DKIM and DMARC **PASS**.
 
+## Going live on avonkidsjournal.com
+
+1. **Server settings:** copy `.env.production.example` to `.env` on the server,
+   fill in the database, SMTP and Turnstile values, then run
+   `php artisan key:generate`, `php artisan migrate --force` and
+   `php artisan config:cache`. (Use `php artisan db:seed --force` only if you want
+   the demo content.) Point the web root at the `public` folder.
+2. **Cloudflare Turnstile widget:** dash.cloudflare.com → **Turnstile** →
+   **Add widget** → name `Kids Avon` → hostnames `avonkidsjournal.com` and
+   `www.avonkidsjournal.com` → mode **Managed** → no pre-clearance → **Create**.
+   Copy the **Site key** to `TURNSTILE_SITE_KEY` and the **Secret key** to
+   `TURNSTILE_SECRET_KEY`, then `php artisan config:cache` again.
+3. **If the domain's DNS is on Cloudflare with the orange cloud (proxied):** set
+   SSL/TLS mode to **Full (strict)**. The site already trusts Cloudflare's
+   published IP ranges, so it sees each visitor's real IP (needed for the rate
+   limits) and knows the page is https. If your host puts its own proxy in
+   front, add its address to `TRUSTED_PROXIES`.
+4. **Email DNS records** (SPF, DKIM, DMARC) for avonkidsjournal.com, see
+   *Sending OTP emails* above. If the DNS is on Cloudflare, add them there as
+   **DNS only** (grey cloud) records, and keep the `mail` record grey too.
+5. Open `/admin`: the **Before going live** box should be gone. Then register a
+   test rider on the live site with your own Gmail to check the code arrives in
+   the inbox.
+
 ## Bot and spam protection
 
 - **Cloudflare Turnstile** robot check on Join, Log in, Send OTP and the admin
-  login. Usually invisible; sometimes a tick box. Set up: Cloudflare dashboard →
-  **Turnstile** → **Add widget** → add your website's domain (and `localhost` for
-  testing) → mode **Managed** → copy the **Site key** and **Secret key** into
-  `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` in `.env` → `php artisan config:clear`.
-  The keys in `.env.example` are Cloudflare's testing keys (they always pass).
+  login. Usually invisible; sometimes a tick box. Tokens are only accepted if
+  they were solved on our own website (`TURNSTILE_HOSTNAMES`, by default the
+  APP_URL domain with and without www) and on the right form (login, register,
+  admin-login). The keys in `.env.example` are Cloudflare's testing keys.
 - **Hidden trap field:** every form has a box people never see; bots that fill
   it in are quietly turned away (nothing saved, no email sent).
 - **Too-fast check:** forms sent back within 2 seconds of opening are treated

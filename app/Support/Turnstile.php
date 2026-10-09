@@ -42,8 +42,16 @@ class Turnstile
         return self::enabled() && array_key_exists((string) config('kidsavon.turnstile.secret_key'), self::TEST_SECRETS);
     }
 
-    /** Returns null when the visitor passed, otherwise a message to show. */
-    public static function check(?string $token, ?string $ip = null): ?string
+    /**
+     * Returns null when the visitor passed, otherwise a message to show.
+     *
+     * As Cloudflare recommends, a genuine token must also come from our own
+     * website (hostname) and from the right form (action), so a token solved
+     * on another site or another form can't be reused here.
+     *
+     * @param  string[]  $actions  form names allowed here, e.g. ['login']
+     */
+    public static function check(?string $token, ?string $ip = null, array $actions = []): ?string
     {
         if (! self::enabled()) {
             return null;
@@ -75,6 +83,19 @@ class Turnstile
 
         if (! ($result['success'] ?? false)) {
             Log::info('Turnstile check failed', ['errors' => $result['error-codes'] ?? null, 'ip' => $ip]);
+
+            return $message;
+        }
+
+        $hostnames = (array) config('kidsavon.turnstile.hostnames', []);
+        if ($hostnames && ! in_array($result['hostname'] ?? null, $hostnames, true)) {
+            Log::warning('Turnstile token from another website', ['hostname' => $result['hostname'] ?? null, 'ip' => $ip]);
+
+            return $message;
+        }
+
+        if ($actions && ! in_array($result['action'] ?? null, $actions, true)) {
+            Log::warning('Turnstile token from another form', ['action' => $result['action'] ?? null, 'expected' => $actions, 'ip' => $ip]);
 
             return $message;
         }
