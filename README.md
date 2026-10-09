@@ -189,6 +189,13 @@ to a Gmail inbox: *Show original* should say SPF, DKIM and DMARC **PASS**.
 
 ## Going live on avonkidsjournal.com
 
+0. **Shared hosting (cPanel):** best is to upload the project *next to*
+   `public_html` (e.g. `/home/kidsuser/kidsavon`) and point the domain's document
+   root at its `public` folder (cPanel → Domains → Manage). If the whole project
+   sits inside `public_html`, the `.htaccess` in the project root sends every
+   request to `public/` and blocks `.env`, `storage/`, `vendor/` etc.
+   The folders `storage`, `bootstrap/cache` and `public/uploads` must be
+   writable: `chmod -R 775 storage bootstrap/cache public/uploads`.
 1. **Server settings:** copy `.env.production.example` to `.env` on the server,
    fill in the database, SMTP and Turnstile values, then run
    `php artisan key:generate`, `php artisan migrate --force` and

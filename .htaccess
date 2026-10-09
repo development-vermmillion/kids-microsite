@@ -1,0 +1,17 @@
+# Safety net for shared hosting (cPanel) when the whole project is uploaded into
+# public_html instead of pointing the domain at the "public" folder.
+# Every request is served from public/, so files like .env, storage/ and vendor/
+# can never be downloaded. (Not used when the domain already points at public/.)
+
+Options -Indexes
+
+# Never serve hidden files such as .env or .git
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(\.well-known/.*)$ $1 [L]
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
