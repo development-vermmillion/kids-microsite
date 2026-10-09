@@ -189,23 +189,28 @@ to a Gmail inbox: *Show original* should say SPF, DKIM and DMARC **PASS**.
 
 ## Going live on avonkidsjournal.com
 
-0. **Shared hosting (cPanel):** best is to upload the project *next to*
-   `public_html` (e.g. `/home/kidsuser/kidsavon`) and point the domain's document
-   root at its `public` folder (cPanel → Domains → Manage). If the whole project
-   sits inside `public_html`, the `.htaccess` in the project root sends every
-   request to `public/` and blocks `.env`, `storage/`, `vendor/` etc.
-   The folders `storage`, `bootstrap/cache` and `public/uploads` must be
-   writable: `chmod -R 775 storage bootstrap/cache public/uploads`.
-1. **Server settings:** copy `.env.production.example` to `.env` on the server,
-   fill in the database, SMTP and Turnstile values, then run
-   `php artisan key:generate`, `php artisan migrate --force` and
-   `php artisan config:cache`. (Use `php artisan db:seed --force` only if you want
-   the demo content.) Point the web root at the `public` folder.
+**Deploying from GitHub with cPanel (Git Version Control):** every deployment
+runs `deploy.sh` (through `.cpanel.yml`). It installs the libraries with Composer,
+creates `.env` from `.env.production.example` the first time, makes the
+storage/upload folders writable, creates the `APP_KEY`, creates/updates the
+database tables, creates the first admin (a random password is printed once if
+`ADMIN_PASSWORD` is empty), caches settings, and ends with a ✓/✗ checklist.
+You can also run it yourself in cPanel → Terminal: `bash deploy.sh`.
+**After changing `.env`, deploy (or run `bash deploy.sh`) again** so the
+change is picked up.
+
+0. **Folder:** best is a repository folder *next to* `public_html` (e.g.
+   `/home/kidsuser/kidsavon`) with the domain's document root pointing at its
+   `public` folder (cPanel → Domains → Manage). If the project sits directly in
+   `public_html`, the `.htaccess` in the project root sends every request to
+   `public/` and blocks `.env`, `storage/`, `vendor/` and the other app files.
+1. **Server settings:** fill in `.env` (database from cPanel → MySQL Databases,
+   SMTP email, Turnstile secret key), keep `APP_DEBUG=false`, then deploy again.
 2. **Cloudflare Turnstile widget:** dash.cloudflare.com → **Turnstile** →
    **Add widget** → name `Kids Avon` → hostnames `avonkidsjournal.com` and
    `www.avonkidsjournal.com` → mode **Managed** → no pre-clearance → **Create**.
    Copy the **Site key** to `TURNSTILE_SITE_KEY` and the **Secret key** to
-   `TURNSTILE_SECRET_KEY`, then `php artisan config:cache` again.
+   `TURNSTILE_SECRET_KEY`, then deploy again.
 3. **If the domain's DNS is on Cloudflare with the orange cloud (proxied):** set
    SSL/TLS mode to **Full (strict)**. The site already trusts Cloudflare's
    published IP ranges, so it sees each visitor's real IP (needed for the rate

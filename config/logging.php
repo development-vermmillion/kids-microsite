@@ -55,7 +55,9 @@ return [
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', (string) env('LOG_STACK', 'single')),
-            'ignore_exceptions' => false,
+            // If the log file can't be written (e.g. folder permissions on the
+            // server), carry on instead of turning every page into an error.
+            'ignore_exceptions' => true,
         ],
 
         'single' => [

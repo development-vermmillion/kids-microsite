@@ -1,0 +1,6 @@
+---
+# cPanel → Git Version Control → "Deploy HEAD Commit" (or a push to the cPanel
+# repository) runs these commands inside the repository folder.
+deployment:
+  tasks:
+    - /bin/bash deploy.sh

@@ -89,6 +89,21 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | First admin account
+    |--------------------------------------------------------------------------
+    |
+    | Created by `php artisan kidsavon:setup` (and the seeder) when there is no
+    | admin yet. If no password is set, a random one is made and printed once.
+    |
+    */
+
+    'admin' => [
+        'email' => env('ADMIN_EMAIL', 'admin@kidsavon.com'),
+        'password' => env('ADMIN_PASSWORD'),
+    ],
+
     'demo_rider_email' => env('DEMO_RIDER_EMAIL', 'alex@kidsavon.test'),
     'demo_rider_mobile' => env('DEMO_RIDER_MOBILE', '9999999999'),
 
