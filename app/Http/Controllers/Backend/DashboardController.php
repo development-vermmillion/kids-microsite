@@ -52,6 +52,9 @@ class DashboardController extends Controller
                 ? 'The Cloudflare robot check is switched off. Add TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY to the .env file.' : null,
             Turnstile::enabled() && blank(config('kidsavon.turnstile.secret_key'))
                 ? 'TURNSTILE_SECRET_KEY is missing in .env, so every login and sign-up is refused. Add the secret key from Cloudflare → Turnstile.' : null,
+            Turnstile::enabled() && filled(config('kidsavon.turnstile.secret_key')) && ! Turnstile::usingTestKeys()
+                && \Illuminate\Support\Facades\Cache::remember('turnstile-secret-ok', 3600, fn () => Turnstile::secretKeyAccepted()) === false
+                ? 'Cloudflare does not accept TURNSTILE_SECRET_KEY in .env, so every login and sign-up is refused. Copy the Secret key from Cloudflare → Turnstile → your widget, then deploy again.' : null,
             Turnstile::usingTestKeys()
                 ? 'The Cloudflare robot check is using testing keys, which let everyone through. Replace TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY in .env with your own keys.' : null,
             OtpService::testCode()

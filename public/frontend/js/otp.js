@@ -101,3 +101,16 @@ function startCountdown(link, label, seconds) {
     };
     tick();
 }
+
+// Pressing Enter in the email box sends the code (instead of submitting the
+// form without one), as long as no code has been typed yet.
+document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || !event.target.matches('form[data-otp-form] input[name="email"]')) return;
+    const form = event.target.closest('form');
+    const otp = form.querySelector('input[name="otp"]');
+    const send = form.querySelector('[data-send-otp]');
+    if (otp && !otp.value.trim() && send) {
+        event.preventDefault();
+        send.click();
+    }
+});

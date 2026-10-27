@@ -43,6 +43,34 @@ class Turnstile
     }
 
     /**
+     * Asks Cloudflare whether the secret key is right (for the set-up checklist).
+     * Returns true / false, or null when Cloudflare can't be reached.
+     */
+    public static function secretKeyAccepted(): ?bool
+    {
+        $secret = (string) config('kidsavon.turnstile.secret_key');
+
+        if ($secret === '') {
+            return false;
+        }
+
+        if (array_key_exists($secret, self::TEST_SECRETS)) {
+            return true;
+        }
+
+        try {
+            $errors = (array) (Http::asForm()->timeout(8)->post(self::VERIFY_URL, [
+                'secret' => $secret,
+                'response' => 'setup-check',
+            ])->json('error-codes') ?? []);
+        } catch (Throwable) {
+            return null;
+        }
+
+        return ! array_intersect($errors, ['missing-input-secret', 'invalid-input-secret']);
+    }
+
+    /**
      * Returns null when the visitor passed, otherwise a message to show.
      *
      * As Cloudflare recommends, a genuine token must also come from our own
@@ -82,14 +110,27 @@ class Turnstile
         }
 
         if (! ($result['success'] ?? false)) {
-            Log::info('Turnstile check failed', ['errors' => $result['error-codes'] ?? null, 'ip' => $ip]);
+            $errors = (array) ($result['error-codes'] ?? []);
+
+            // Our own set-up problem, not the visitor's: say so, and log it loudly.
+            if (array_intersect($errors, ['missing-input-secret', 'invalid-input-secret'])) {
+                Log::error('Turnstile: Cloudflare rejected TURNSTILE_SECRET_KEY. Copy the Secret key of the widget into .env, then deploy again (or run php artisan config:cache).', ['errors' => $errors]);
+
+                return 'The robot check is not set up correctly on this website yet. Please try again later.';
+            }
+
+            Log::warning('Turnstile check failed', ['errors' => $errors, 'ip' => $ip]);
 
             return $message;
         }
 
         $hostnames = (array) config('kidsavon.turnstile.hostnames', []);
         if ($hostnames && ! in_array($result['hostname'] ?? null, $hostnames, true)) {
-            Log::warning('Turnstile token from another website', ['hostname' => $result['hostname'] ?? null, 'ip' => $ip]);
+            Log::warning('Turnstile token came from a website address that is not allowed. Add it to TURNSTILE_HOSTNAMES in .env if it is yours.', [
+                'hostname' => $result['hostname'] ?? null,
+                'allowed' => $hostnames,
+                'ip' => $ip,
+            ]);
 
             return $message;
         }

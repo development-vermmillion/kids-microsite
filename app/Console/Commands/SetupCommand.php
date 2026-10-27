@@ -133,6 +133,13 @@ class SetupCommand extends Command
             ['MAIL_FROM_ADDRESS set', filled(config('mail.from.address')) && ! str_ends_with((string) config('mail.from.address'), '@example.com')],
         ];
 
+        if (Turnstile::enabled()) {
+            $accepted = Turnstile::secretKeyAccepted();
+            $checks[] = $accepted === null
+                ? ['This server can reach challenges.cloudflare.com (needed for the robot check) – ask your host to allow it', false]
+                : ['Cloudflare accepts TURNSTILE_SECRET_KEY', $accepted];
+        }
+
         $this->newLine();
         $this->info('Settings check');
         foreach ($checks as [$label, $ok]) {
@@ -140,6 +147,11 @@ class SetupCommand extends Command
             if (! $ok && $live) {
                 $this->problems++;
             }
+        }
+
+        if (Turnstile::enabled()) {
+            $this->line('  • Robot check accepted only on: '.implode(', ', (array) config('kidsavon.turnstile.hostnames')).
+                ' (TURNSTILE_HOSTNAMES; must match the address in the browser and the hostnames of the Cloudflare widget)');
         }
     }
 
