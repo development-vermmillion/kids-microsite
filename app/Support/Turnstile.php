@@ -124,7 +124,13 @@ class Turnstile
             return $message;
         }
 
-        $hostnames = (array) config('kidsavon.turnstile.hostnames', []);
+        // Accepted: the address this page was opened on, plus TURNSTILE_HOSTNAMES
+        // (by default the APP_URL domain with and without www). Cloudflare itself
+        // only issues tokens on the hostnames listed in the widget.
+        $hostnames = array_values(array_unique(array_filter(array_merge(
+            (array) config('kidsavon.turnstile.hostnames', []),
+            app()->runningInConsole() ? [] : [request()->getHost()],
+        ))));
         if ($hostnames && ! in_array($result['hostname'] ?? null, $hostnames, true)) {
             Log::warning('Turnstile token came from a website address that is not allowed. Add it to TURNSTILE_HOSTNAMES in .env if it is yours.', [
                 'hostname' => $result['hostname'] ?? null,
